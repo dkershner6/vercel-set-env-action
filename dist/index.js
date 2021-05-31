@@ -20,20 +20,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.VALID_TARGETS = exports.VALID_TYPES = void 0;
 const axios_1 = __importDefault(__webpack_require__(6545));
 const core_1 = __webpack_require__(2186);
-const VALID_TYPES = ["encrypted", "plain"];
-// eslint-disable-next-line no-shadow
-var VercelEnvVariableTarget;
-(function (VercelEnvVariableTarget) {
-    VercelEnvVariableTarget["Production"] = "production";
-    VercelEnvVariableTarget["Preview"] = "preview";
-    VercelEnvVariableTarget["Development"] = "development";
-})(VercelEnvVariableTarget || (VercelEnvVariableTarget = {}));
-const VALID_TARGETS = [
-    VercelEnvVariableTarget.Production,
-    VercelEnvVariableTarget.Preview,
-    VercelEnvVariableTarget.Development,
+const vercel_1 = __webpack_require__(5875);
+exports.VALID_TYPES = ["encrypted", "plain"];
+exports.VALID_TARGETS = [
+    vercel_1.VercelEnvVariableTarget.Production,
+    vercel_1.VercelEnvVariableTarget.Preview,
+    vercel_1.VercelEnvVariableTarget.Development,
 ];
 class VercelEnvVariabler {
     constructor(token, projectName, envVariableKeysAsString, teamId) {
@@ -46,33 +41,31 @@ class VercelEnvVariabler {
         if ((envVariableKeys === null || envVariableKeys === void 0 ? void 0 : envVariableKeys.length) > 0) {
             this.envVariableKeys = envVariableKeys;
         }
-        if (!this.token || !this.projectName || this.envVariableKeys.length === 0) {
+        if (!this.token ||
+            !this.projectName ||
+            this.envVariableKeys.length === 0) {
             throw new Error("Missing required input(s).");
         }
         this.vercelClient = axios_1.default.create({
             headers: {
                 Authorization: `Bearer ${this.token}`,
             },
-            baseURL: "https://api.vercel.com/v1",
+            baseURL: "https://api.vercel.com/v8",
             params: {
                 teamId: this.teamId,
             },
         });
     }
     populateExistingEnvVariables() {
-        var _a, _b, _c;
+        var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
-            const projectResponse = yield this.vercelClient.get(`/projects/${this.projectName}`);
-            this.vercelProjectId = (_a = projectResponse === null || projectResponse === void 0 ? void 0 : projectResponse.data) === null || _a === void 0 ? void 0 : _a.id;
-            if (!this.vercelProjectId) {
-                throw new Error(`Project ${this.projectName} not found`);
-            }
-            const env = (_b = projectResponse === null || projectResponse === void 0 ? void 0 : projectResponse.data) === null || _b === void 0 ? void 0 : _b.env;
+            const envResponse = yield vercel_1.listEnvVariables(this.vercelClient, this.projectName);
+            const env = (_a = envResponse === null || envResponse === void 0 ? void 0 : envResponse.data) === null || _a === void 0 ? void 0 : _a.envs;
             if (env) {
                 core_1.info(`Found ${env.length} existing env variables`);
                 for (const existingEnvVariable of env) {
                     for (const existingTarget of existingEnvVariable.target) {
-                        const preExistingVariablesForTarget = (_c = this.existingEnvVariables[existingTarget]) !== null && _c !== void 0 ? _c : {};
+                        const preExistingVariablesForTarget = (_b = this.existingEnvVariables[existingTarget]) !== null && _b !== void 0 ? _b : {};
                         this.existingEnvVariables[existingTarget] = Object.assign(Object.assign({}, preExistingVariablesForTarget), { [existingEnvVariable.key]: existingEnvVariable });
                     }
                 }
@@ -107,31 +100,14 @@ class VercelEnvVariabler {
                     type,
                 });
             }
-            else if (existingTargets.length !== targets.length) {
-                const newTargets = targets.filter((target) => !existingTargets.includes(target));
-                core_1.info(`Existing variable found for ${envVariableKey}, but with ${newTargets.join(",")} as new targets.`);
-                yield this.createEnvVariable({
-                    key: envVariableKey,
+            else {
+                core_1.info(`Existing variable found for ${envVariableKey}, comparing values.`);
+                yield this.processPossibleEnvVariableUpdate({
                     value,
-                    targets: newTargets,
+                    targets,
                     type,
-                });
-                if (type === "plain") {
-                    this.processPossibleEnvVariableUpdate({
-                        value,
-                        existingVariables,
-                    });
-                }
-            }
-            else if (type === "plain") {
-                core_1.info(`Existing variable found for ${envVariableKey}, comparing plain values.`);
-                this.processPossibleEnvVariableUpdate({
-                    value,
                     existingVariables,
                 });
-            }
-            else {
-                core_1.info(`Existing variable found for ${envVariableKey}, since it is encrypted, assuming it is equal.`);
             }
         });
     }
@@ -148,31 +124,36 @@ class VercelEnvVariabler {
         if (!type) {
             throw new Error(`Variable ${envVariableKey} is missing env variable: ${`TYPE_${envVariableKey}`}`);
         }
-        if (!VALID_TYPES.includes(type)) {
-            throw new Error(`No valid type found for ${envVariableKey}, type given: ${type}, valid targets: ${VALID_TYPES.join(",")}`);
+        if (!exports.VALID_TYPES.includes(type)) {
+            throw new Error(`No valid type found for ${envVariableKey}, type given: ${type}, valid types: ${exports.VALID_TYPES.join(",")}`);
         }
         const targets = targetString
             .split(",")
-            .filter((target) => VALID_TARGETS.includes(target));
+            .filter((target) => exports.VALID_TARGETS.includes(target));
         if (targets.length === 0) {
-            throw new Error(`No valid targets found for ${envVariableKey}, targets given: ${targetString}, valid targets: ${VALID_TARGETS.join(",")}`);
+            throw new Error(`No valid targets found for ${envVariableKey}, targets given: ${targetString}, valid targets: ${exports.VALID_TARGETS.join(",")}`);
         }
         return { value, targets, type };
     }
     createEnvVariable({ type, key, value, targets, }) {
         return __awaiter(this, void 0, void 0, function* () {
-            const createResponse = yield this.vercelClient.post(`/projects/${this.projectName}/env`, { type, key, value, target: targets });
+            const createResponse = yield vercel_1.postEnvVariable(this.vercelClient, this.projectName, { type, key, value, target: targets });
             if (!(createResponse === null || createResponse === void 0 ? void 0 : createResponse.data)) {
                 core_1.info(`Variable ${key} with targets ${targets.join(",")} created successfully`);
             }
         });
     }
-    processPossibleEnvVariableUpdate({ value, existingVariables, }) {
+    processPossibleEnvVariableUpdate({ type, value, targets, existingVariables, }) {
         return __awaiter(this, void 0, void 0, function* () {
             const existingVariable = Object.values(existingVariables)[0]; // They are all actually the same
-            if (existingVariable.type === "plain" && existingVariable.value !== value) {
-                core_1.info(`Value for env variable ${existingVariable.key} has found to have changed, updating value`);
-                yield this.vercelClient.patch(`/projects/${this.projectName}/env/${existingVariable.id}`, { value });
+            if (existingVariable.value !== value ||
+                existingVariable.target.length !== targets.length ||
+                existingVariable.type !== type) {
+                core_1.info(`Value, target, or type for env variable ${existingVariable.key} has found to have changed, updating value`);
+                const patchResponse = yield vercel_1.patchEnvVariable(this.vercelClient, this.projectName, existingVariable.id, { type, value, target: targets });
+                if (patchResponse === null || patchResponse === void 0 ? void 0 : patchResponse.data) {
+                    core_1.info(`${existingVariable.key} updated successfully.`);
+                }
             }
             else {
                 core_1.info(`No change found for ${existingVariable.key}, skipping...`);
@@ -225,6 +206,49 @@ function run() {
     });
 }
 run();
+
+
+/***/ }),
+
+/***/ 5875:
+/***/ (function(__unused_webpack_module, exports) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.patchEnvVariable = exports.postEnvVariable = exports.listEnvVariables = exports.VercelEnvVariableTarget = void 0;
+// eslint-disable-next-line no-shadow
+var VercelEnvVariableTarget;
+(function (VercelEnvVariableTarget) {
+    VercelEnvVariableTarget["Production"] = "production";
+    VercelEnvVariableTarget["Preview"] = "preview";
+    VercelEnvVariableTarget["Development"] = "development";
+})(VercelEnvVariableTarget = exports.VercelEnvVariableTarget || (exports.VercelEnvVariableTarget = {}));
+const listEnvVariables = (vercelClient, projectName) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield vercelClient.get(`/v8/projects/${projectName}/env`, {
+        params: {
+            decrypt: "true",
+        },
+    });
+});
+exports.listEnvVariables = listEnvVariables;
+const postEnvVariable = (vercelClient, projectName, envVariable) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield vercelClient.post(`/projects/${projectName}/env`, envVariable);
+});
+exports.postEnvVariable = postEnvVariable;
+const patchEnvVariable = (vercelClient, projectName, envVariableId, envVariable) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield vercelClient.patch(`/projects/${projectName}/env/${envVariableId}`, envVariable);
+});
+exports.patchEnvVariable = patchEnvVariable;
 
 
 /***/ }),
