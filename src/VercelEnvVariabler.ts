@@ -108,7 +108,14 @@ export default class VercelEnvVariabler {
     );
 
     const existingVariables = targets.reduce((result, target) => {
-      result[target] = this.existingEnvVariables?.[target]?.[envVariableKey];
+      const existingVariable = this.existingEnvVariables?.[target]?.[
+        envVariableKey
+      ];
+
+      if (existingVariable) {
+        result[target] = existingVariable;
+      }
+
       return result;
     }, {} as Record<VercelEnvVariableTarget, VercelEnvVariable>);
 

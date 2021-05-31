@@ -1,6 +1,6 @@
 {
   "name": "vercel-set-env-action",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "description": "A GitHub Action that ensures certain environment variables are set in Vercel",
   "main": "lib/main.js",
