@@ -32,7 +32,7 @@ export const listEnvVariables = async (
 > => {
     return await vercelClient.get<{
         envs: VercelEnvVariable[];
-    }>(`/v8/projects/${projectName}/env`, {
+    }>(`/projects/${projectName}/env`, {
         params: {
             decrypt: "true",
         },
