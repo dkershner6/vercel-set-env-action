@@ -3,7 +3,7 @@ import { info } from "@actions/core";
 
 type VercelEnvVariableType = "encrypted" | "plain";
 
-const VALID_TARGETS = ["encrypted", "plain"];
+const VALID_TYPES = ["encrypted", "plain"];
 
 // eslint-disable-next-line no-shadow
 enum VercelEnvVariableTarget {
@@ -11,6 +11,12 @@ enum VercelEnvVariableTarget {
   Preview = "preview",
   Development = "development",
 }
+
+const VALID_TARGETS: VercelEnvVariableTarget[] = [
+  VercelEnvVariableTarget.Production,
+  VercelEnvVariableTarget.Preview,
+  VercelEnvVariableTarget.Development,
+];
 
 interface VercelEnvVariable {
   type: VercelEnvVariableType;
@@ -176,6 +182,13 @@ export default class VercelEnvVariabler {
     if (!type) {
       throw new Error(
         `Variable ${envVariableKey} is missing env variable: ${`TYPE_${envVariableKey}`}`
+      );
+    }
+    if (!VALID_TYPES.includes(type)) {
+      throw new Error(
+        `No valid type found for ${envVariableKey}, type given: ${type}, valid targets: ${VALID_TYPES.join(
+          ","
+        )}`
       );
     }
 
