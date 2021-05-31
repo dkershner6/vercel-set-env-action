@@ -4,12 +4,18 @@ import {
     listEnvVariables,
     patchEnvVariable,
     postEnvVariable,
-    VALID_TARGETS,
-    VALID_TYPES,
     VercelEnvVariable,
     VercelEnvVariableTarget,
     VercelEnvVariableType,
 } from "./vercel";
+
+export const VALID_TYPES = ["encrypted", "plain"];
+
+export const VALID_TARGETS: VercelEnvVariableTarget[] = [
+    VercelEnvVariableTarget.Production,
+    VercelEnvVariableTarget.Preview,
+    VercelEnvVariableTarget.Development,
+];
 
 export default class VercelEnvVariabler {
     private envVariableKeys = new Array<string>();
@@ -150,7 +156,7 @@ export default class VercelEnvVariabler {
         }
         if (!VALID_TYPES.includes(type)) {
             throw new Error(
-                `No valid type found for ${envVariableKey}, type given: ${type}, valid targets: ${VALID_TYPES.join(
+                `No valid type found for ${envVariableKey}, type given: ${type}, valid types: ${VALID_TYPES.join(
                     ","
                 )}`
             );
@@ -213,7 +219,7 @@ export default class VercelEnvVariabler {
         const existingVariable = Object.values(existingVariables)[0]; // They are all actually the same
         if (
             existingVariable.value !== value ||
-            existingVariable.target !== targets ||
+            existingVariable.target.length !== targets.length ||
             existingVariable.type !== type
         ) {
             info(

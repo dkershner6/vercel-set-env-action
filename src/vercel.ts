@@ -2,20 +2,12 @@ import { AxiosInstance, AxiosResponse } from "axios";
 
 export type VercelEnvVariableType = "encrypted" | "plain";
 
-export const VALID_TYPES = ["encrypted", "plain"];
-
 // eslint-disable-next-line no-shadow
 export enum VercelEnvVariableTarget {
     Production = "production",
     Preview = "preview",
     Development = "development",
 }
-
-export const VALID_TARGETS: VercelEnvVariableTarget[] = [
-    VercelEnvVariableTarget.Production,
-    VercelEnvVariableTarget.Preview,
-    VercelEnvVariableTarget.Development,
-];
 
 export interface VercelEnvVariable {
     type: VercelEnvVariableType;
