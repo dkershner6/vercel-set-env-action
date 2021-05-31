@@ -22,7 +22,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const axios_1 = __importDefault(__webpack_require__(6545));
 const core_1 = __webpack_require__(2186);
-const VALID_TARGETS = ["encrypted", "plain"];
+const VALID_TYPES = ["encrypted", "plain"];
 // eslint-disable-next-line no-shadow
 var VercelEnvVariableTarget;
 (function (VercelEnvVariableTarget) {
@@ -30,6 +30,11 @@ var VercelEnvVariableTarget;
     VercelEnvVariableTarget["Preview"] = "preview";
     VercelEnvVariableTarget["Development"] = "development";
 })(VercelEnvVariableTarget || (VercelEnvVariableTarget = {}));
+const VALID_TARGETS = [
+    VercelEnvVariableTarget.Production,
+    VercelEnvVariableTarget.Preview,
+    VercelEnvVariableTarget.Development,
+];
 class VercelEnvVariabler {
     constructor(token, projectName, envVariableKeysAsString, teamId) {
         this.token = token;
@@ -139,6 +144,9 @@ class VercelEnvVariabler {
         }
         if (!type) {
             throw new Error(`Variable ${envVariableKey} is missing env variable: ${`TYPE_${envVariableKey}`}`);
+        }
+        if (!VALID_TYPES.includes(type)) {
+            throw new Error(`No valid type found for ${envVariableKey}, type given: ${type}, valid targets: ${VALID_TYPES.join(",")}`);
         }
         const targets = targetString
             .split(",")

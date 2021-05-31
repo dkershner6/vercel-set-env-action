@@ -195,7 +195,7 @@ export default class VercelEnvVariabler {
     const targets = targetString
       .split(",")
       .filter((target) =>
-        VALID_TARGETS.includes(target)
+        VALID_TARGETS.includes(target as VercelEnvVariableTarget)
       ) as VercelEnvVariableTarget[];
 
     if (targets.length === 0) {
