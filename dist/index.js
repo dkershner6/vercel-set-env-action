@@ -234,7 +234,7 @@ var VercelEnvVariableTarget;
     VercelEnvVariableTarget["Development"] = "development";
 })(VercelEnvVariableTarget = exports.VercelEnvVariableTarget || (exports.VercelEnvVariableTarget = {}));
 const listEnvVariables = (vercelClient, projectName) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield vercelClient.get(`/v8/projects/${projectName}/env`, {
+    return yield vercelClient.get(`/projects/${projectName}/env`, {
         params: {
             decrypt: "true",
         },
