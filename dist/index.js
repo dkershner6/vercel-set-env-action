@@ -91,7 +91,10 @@ class VercelEnvVariabler {
             const { value, targets, type } = this.parseAndValidateEnvVariable(envVariableKey);
             const existingVariables = targets.reduce((result, target) => {
                 var _a, _b;
-                result[target] = (_b = (_a = this.existingEnvVariables) === null || _a === void 0 ? void 0 : _a[target]) === null || _b === void 0 ? void 0 : _b[envVariableKey];
+                const existingVariable = (_b = (_a = this.existingEnvVariables) === null || _a === void 0 ? void 0 : _a[target]) === null || _b === void 0 ? void 0 : _b[envVariableKey];
+                if (existingVariable) {
+                    result[target] = existingVariable;
+                }
                 return result;
             }, {});
             const existingTargets = Object.keys(existingVariables);
