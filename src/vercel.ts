@@ -14,6 +14,7 @@ export interface VercelEnvVariable {
     value: string;
     target: VercelEnvVariableTarget[];
     configurationId?: string;
+    gitBranch?: string;
     id: string;
     key: string;
     createdAt: number;
