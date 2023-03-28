@@ -17,7 +17,7 @@ jobs:
           token: ${{ secrets.VERCEL_API_TOKEN }}
           teamId: ${{ secrets.VERCEL_TEAM_ID }} # optional, without will use personal
           projectName: vercel-env-setter # project name in Vercel
-          envVariableKeys: ENV_VAR1,ENV_VAR2
+          envVariableKeys: ENV_VAR1,ENV_VAR2,ENV_VAR3
         env:
           ENV_VAR1: myEnvVar1
           TARGET_ENV_VAR1: production # comma delimited, one of [production, preview, development]
@@ -25,4 +25,8 @@ jobs:
           ENV_VAR2: envVar2Value
           TARGET_ENV_VAR2: preview,development
           TYPE_ENV_VAR2: plain
+          ENV_VAR3: envVar3Value
+          TARGET_ENV_VAR3: preview
+          TYPE_ENV_VAR3: plain
+          GIT_BRANCH_ENV_VAR3: feature/foo
 ```
