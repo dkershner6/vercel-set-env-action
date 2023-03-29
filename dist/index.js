@@ -81,7 +81,7 @@ class VercelEnvVariabler {
     }
     processEnvVariable(envVariableKey) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { value, targets, type } = this.parseAndValidateEnvVariable(envVariableKey);
+            const { value, targets, type, gitBranch, } = this.parseAndValidateEnvVariable(envVariableKey);
             const existingVariables = targets.reduce((result, target) => {
                 var _a, _b;
                 const existingVariable = (_b = (_a = this.existingEnvVariables) === null || _a === void 0 ? void 0 : _a[target]) === null || _b === void 0 ? void 0 : _b[envVariableKey];
@@ -98,6 +98,7 @@ class VercelEnvVariabler {
                     value,
                     targets,
                     type,
+                    gitBranch,
                 });
             }
             else {
@@ -106,6 +107,7 @@ class VercelEnvVariabler {
                     value,
                     targets,
                     type,
+                    gitBranch,
                     existingVariables,
                 });
             }
@@ -115,6 +117,7 @@ class VercelEnvVariabler {
         const value = process.env[envVariableKey];
         const targetString = process.env[`TARGET_${envVariableKey}`];
         const type = process.env[`TYPE_${envVariableKey}`];
+        const gitBranch = process.env[`GIT_BRANCH_${envVariableKey}`];
         if (!value) {
             throw new Error(`Variable ${envVariableKey} is missing env variable: ${envVariableKey}`);
         }
@@ -130,27 +133,33 @@ class VercelEnvVariabler {
         const targets = targetString
             .split(",")
             .filter((target) => exports.VALID_TARGETS.includes(target));
+        if (gitBranch &&
+            (targets.length !== 1 ||
+                targets[0] !== vercel_1.VercelEnvVariableTarget.Preview)) {
+            throw new Error('Only "preview" target is allowed when using gitBranch');
+        }
         if (targets.length === 0) {
             throw new Error(`No valid targets found for ${envVariableKey}, targets given: ${targetString}, valid targets: ${exports.VALID_TARGETS.join(",")}`);
         }
-        return { value, targets, type };
+        return { value, targets, type, gitBranch };
     }
-    createEnvVariable({ type, key, value, targets, }) {
+    createEnvVariable({ type, key, value, targets, gitBranch, }) {
         return __awaiter(this, void 0, void 0, function* () {
-            const createResponse = yield vercel_1.postEnvVariable(this.vercelClient, this.projectName, { type, key, value, target: targets });
+            const createResponse = yield vercel_1.postEnvVariable(this.vercelClient, this.projectName, { type, key, value, target: targets, gitBranch });
             if (!(createResponse === null || createResponse === void 0 ? void 0 : createResponse.data)) {
                 core_1.info(`Variable ${key} with targets ${targets.join(",")} created successfully`);
             }
         });
     }
-    processPossibleEnvVariableUpdate({ type, value, targets, existingVariables, }) {
+    processPossibleEnvVariableUpdate({ type, value, targets, existingVariables, gitBranch, }) {
         return __awaiter(this, void 0, void 0, function* () {
             const existingVariable = Object.values(existingVariables)[0]; // They are all actually the same
             if (existingVariable.value !== value ||
                 existingVariable.target.length !== targets.length ||
-                existingVariable.type !== type) {
-                core_1.info(`Value, target, or type for env variable ${existingVariable.key} has found to have changed, updating value`);
-                const patchResponse = yield vercel_1.patchEnvVariable(this.vercelClient, this.projectName, existingVariable.id, { type, value, target: targets });
+                existingVariable.type !== type ||
+                existingVariable.gitBranch !== gitBranch) {
+                core_1.info(`Value, target, type or gitBranch for env variable ${existingVariable.key} has found to have changed, updating value`);
+                const patchResponse = yield vercel_1.patchEnvVariable(this.vercelClient, this.projectName, existingVariable.id, { type, value, target: targets, gitBranch });
                 if (patchResponse === null || patchResponse === void 0 ? void 0 : patchResponse.data) {
                     core_1.info(`${existingVariable.key} updated successfully.`);
                 }
@@ -4428,7 +4437,7 @@ module.exports = (flag, argv = process.argv) => {
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse("{\"_from\":\"axios\",\"_id\":\"axios@0.21.1\",\"_inBundle\":false,\"_integrity\":\"sha512-dKQiRHxGD9PPRIUNIWvZhPTPpl1rf/OxTYKsqKUDjBwYylTvV7SjSHJb9ratfyzM6wCdLCOYLzs73qpg5c4iGA==\",\"_location\":\"/axios\",\"_phantomChildren\":{},\"_requested\":{\"type\":\"tag\",\"registry\":true,\"raw\":\"axios\",\"name\":\"axios\",\"escapedName\":\"axios\",\"rawSpec\":\"\",\"saveSpec\":null,\"fetchSpec\":\"latest\"},\"_requiredBy\":[\"#USER\",\"/\"],\"_resolved\":\"https://registry.npmjs.org/axios/-/axios-0.21.1.tgz\",\"_shasum\":\"22563481962f4d6bde9a76d516ef0e5d3c09b2b8\",\"_spec\":\"axios\",\"_where\":\"/home/dkershner/repos/vercel-set-env-action\",\"author\":{\"name\":\"Matt Zabriskie\"},\"browser\":{\"./lib/adapters/http.js\":\"./lib/adapters/xhr.js\"},\"bugs\":{\"url\":\"https://github.com/axios/axios/issues\"},\"bundleDependencies\":false,\"bundlesize\":[{\"path\":\"./dist/axios.min.js\",\"threshold\":\"5kB\"}],\"dependencies\":{\"follow-redirects\":\"^1.10.0\"},\"deprecated\":false,\"description\":\"Promise based HTTP client for the browser and node.js\",\"devDependencies\":{\"bundlesize\":\"^0.17.0\",\"coveralls\":\"^3.0.0\",\"es6-promise\":\"^4.2.4\",\"grunt\":\"^1.0.2\",\"grunt-banner\":\"^0.6.0\",\"grunt-cli\":\"^1.2.0\",\"grunt-contrib-clean\":\"^1.1.0\",\"grunt-contrib-watch\":\"^1.0.0\",\"grunt-eslint\":\"^20.1.0\",\"grunt-karma\":\"^2.0.0\",\"grunt-mocha-test\":\"^0.13.3\",\"grunt-ts\":\"^6.0.0-beta.19\",\"grunt-webpack\":\"^1.0.18\",\"istanbul-instrumenter-loader\":\"^1.0.0\",\"jasmine-core\":\"^2.4.1\",\"karma\":\"^1.3.0\",\"karma-chrome-launcher\":\"^2.2.0\",\"karma-coverage\":\"^1.1.1\",\"karma-firefox-launcher\":\"^1.1.0\",\"karma-jasmine\":\"^1.1.1\",\"karma-jasmine-ajax\":\"^0.1.13\",\"karma-opera-launcher\":\"^1.0.0\",\"karma-safari-launcher\":\"^1.0.0\",\"karma-sauce-launcher\":\"^1.2.0\",\"karma-sinon\":\"^1.0.5\",\"karma-sourcemap-loader\":\"^0.3.7\",\"karma-webpack\":\"^1.7.0\",\"load-grunt-tasks\":\"^3.5.2\",\"minimist\":\"^1.2.0\",\"mocha\":\"^5.2.0\",\"sinon\":\"^4.5.0\",\"typescript\":\"^2.8.1\",\"url-search-params\":\"^0.10.0\",\"webpack\":\"^1.13.1\",\"webpack-dev-server\":\"^1.14.1\"},\"homepage\":\"https://github.com/axios/axios\",\"jsdelivr\":\"dist/axios.min.js\",\"keywords\":[\"xhr\",\"http\",\"ajax\",\"promise\",\"node\"],\"license\":\"MIT\",\"main\":\"index.js\",\"name\":\"axios\",\"repository\":{\"type\":\"git\",\"url\":\"git+https://github.com/axios/axios.git\"},\"scripts\":{\"build\":\"NODE_ENV=production grunt build\",\"coveralls\":\"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js\",\"examples\":\"node ./examples/server.js\",\"fix\":\"eslint --fix lib/**/*.js\",\"postversion\":\"git push && git push --tags\",\"preversion\":\"npm test\",\"start\":\"node ./sandbox/server.js\",\"test\":\"grunt test && bundlesize\",\"version\":\"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json\"},\"typings\":\"./index.d.ts\",\"unpkg\":\"dist/axios.min.js\",\"version\":\"0.21.1\"}");
+module.exports = JSON.parse("{\"name\":\"axios\",\"version\":\"0.21.1\",\"description\":\"Promise based HTTP client for the browser and node.js\",\"main\":\"index.js\",\"scripts\":{\"test\":\"grunt test && bundlesize\",\"start\":\"node ./sandbox/server.js\",\"build\":\"NODE_ENV=production grunt build\",\"preversion\":\"npm test\",\"version\":\"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json\",\"postversion\":\"git push && git push --tags\",\"examples\":\"node ./examples/server.js\",\"coveralls\":\"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js\",\"fix\":\"eslint --fix lib/**/*.js\"},\"repository\":{\"type\":\"git\",\"url\":\"https://github.com/axios/axios.git\"},\"keywords\":[\"xhr\",\"http\",\"ajax\",\"promise\",\"node\"],\"author\":\"Matt Zabriskie\",\"license\":\"MIT\",\"bugs\":{\"url\":\"https://github.com/axios/axios/issues\"},\"homepage\":\"https://github.com/axios/axios\",\"devDependencies\":{\"bundlesize\":\"^0.17.0\",\"coveralls\":\"^3.0.0\",\"es6-promise\":\"^4.2.4\",\"grunt\":\"^1.0.2\",\"grunt-banner\":\"^0.6.0\",\"grunt-cli\":\"^1.2.0\",\"grunt-contrib-clean\":\"^1.1.0\",\"grunt-contrib-watch\":\"^1.0.0\",\"grunt-eslint\":\"^20.1.0\",\"grunt-karma\":\"^2.0.0\",\"grunt-mocha-test\":\"^0.13.3\",\"grunt-ts\":\"^6.0.0-beta.19\",\"grunt-webpack\":\"^1.0.18\",\"istanbul-instrumenter-loader\":\"^1.0.0\",\"jasmine-core\":\"^2.4.1\",\"karma\":\"^1.3.0\",\"karma-chrome-launcher\":\"^2.2.0\",\"karma-coverage\":\"^1.1.1\",\"karma-firefox-launcher\":\"^1.1.0\",\"karma-jasmine\":\"^1.1.1\",\"karma-jasmine-ajax\":\"^0.1.13\",\"karma-opera-launcher\":\"^1.0.0\",\"karma-safari-launcher\":\"^1.0.0\",\"karma-sauce-launcher\":\"^1.2.0\",\"karma-sinon\":\"^1.0.5\",\"karma-sourcemap-loader\":\"^0.3.7\",\"karma-webpack\":\"^1.7.0\",\"load-grunt-tasks\":\"^3.5.2\",\"minimist\":\"^1.2.0\",\"mocha\":\"^5.2.0\",\"sinon\":\"^4.5.0\",\"typescript\":\"^2.8.1\",\"url-search-params\":\"^0.10.0\",\"webpack\":\"^1.13.1\",\"webpack-dev-server\":\"^1.14.1\"},\"browser\":{\"./lib/adapters/http.js\":\"./lib/adapters/xhr.js\"},\"jsdelivr\":\"dist/axios.min.js\",\"unpkg\":\"dist/axios.min.js\",\"typings\":\"./index.d.ts\",\"dependencies\":{\"follow-redirects\":\"^1.10.0\"},\"bundlesize\":[{\"path\":\"./dist/axios.min.js\",\"threshold\":\"5kB\"}]}");
 
 /***/ }),
 
