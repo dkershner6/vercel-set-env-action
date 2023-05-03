@@ -1,5 +1,7 @@
 export const ENV_2_VARIABLE_ID = "XhHeMKBSPqa42soM";
 export const ENV_3_VARIABLE_ID = "XhHeMKBSPqa42soN";
+export const ENV_6_BRANCH_FOO_VARIABLE_ID = "XhHeMKBSPqa42soO";
+export const ENV_7_VARIABLE_ID = "XhHeMKBSPqa42soP";
 
 export const mockEnvVariablesResponse = [
     {
@@ -33,6 +35,31 @@ export const mockEnvVariablesResponse = [
         configurationId: null,
         id: ENV_3_VARIABLE_ID,
         key: "ENV_3",
+        createdAt: 1622428636135,
+        updatedAt: 1622428636135,
+        createdBy: "1234",
+        updatedBy: null,
+    },
+    {
+        type: "encrypted",
+        value: "ENV_6_BRANCH_FOO_VALUE",
+        target: ["preview"],
+        configurationId: null,
+        id: ENV_6_BRANCH_FOO_VARIABLE_ID,
+        key: "ENV_6",
+        gitBranch: "foo",
+        createdAt: 1622428636135,
+        updatedAt: 1622428636135,
+        createdBy: "1234",
+        updatedBy: null,
+    },
+    {
+        type: "encrypted",
+        value: "ENV_7_VALUE",
+        target: ["preview"],
+        configurationId: null,
+        id: ENV_7_VARIABLE_ID,
+        key: "ENV_7",
         createdAt: 1622428636135,
         updatedAt: 1622428636135,
         createdBy: "1234",
