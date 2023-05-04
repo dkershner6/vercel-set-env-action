@@ -264,7 +264,7 @@ describe("VercelEnvVariabler", () => {
     });
 
     it("Should determine no changes for ENV_6 for foo branch", async () => {
-        // overwrite process.env of ENV_6 for branch bar (set in beforeEach) to old foo branch values (see envVariableFixtures)
+        // overwrite process.env of ENV_6 for branch bar (set in beforeAll) to old foo branch values (see envVariableFixtures)
         process.env.ENV_6 = "ENV_6_BRANCH_FOO_VALUE";
         process.env.TARGET_ENV_6 = "preview";
         process.env.TYPE_ENV_6 = "encrypted";
