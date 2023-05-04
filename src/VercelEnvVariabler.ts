@@ -107,12 +107,11 @@ export default class VercelEnvVariabler {
         }, {} as Record<VercelEnvVariableTarget, VercelEnvVariable>);
 
         const existingTargets = Object.keys(existingVariables);
-        const gitBranchInfoTextSnippet = gitBranch
-            ? ` on git branch '${gitBranch}'`
-            : "";
         if (existingTargets.length === 0) {
             info(
-                `No existing variable found for ${envVariableKey}${gitBranchInfoTextSnippet}, creating.`
+                `No existing variable found for ${envVariableKey}${this.gitBranchInfoTextSnippet(
+                    gitBranch
+                )}, creating.`
             );
             await this.createEnvVariable({
                 key: envVariableKey,
@@ -123,7 +122,9 @@ export default class VercelEnvVariabler {
             });
         } else {
             info(
-                `Existing variable found for ${envVariableKey}${gitBranchInfoTextSnippet}, comparing values.`
+                `Existing variable found for ${envVariableKey}${this.gitBranchInfoTextSnippet(
+                    gitBranch
+                )}, comparing values.`
             );
             await this.processPossibleEnvVariableUpdate({
                 value,
@@ -222,9 +223,9 @@ export default class VercelEnvVariabler {
 
         if (!createResponse?.data) {
             info(
-                `Variable ${key} with targets ${targets.join(
-                    ","
-                )} created successfully`
+                `Variable ${key}${this.gitBranchInfoTextSnippet(
+                    gitBranch
+                )} with targets ${targets.join(",")} created successfully`
             );
         }
     }
@@ -243,9 +244,7 @@ export default class VercelEnvVariabler {
         gitBranch: string | undefined;
     }) {
         const existingVariable = Object.values(existingVariables)[0]; // They are all actually the same
-        const gitBranchInfoTextSnippet = gitBranch
-            ? ` on git branch '${gitBranch}'`
-            : "";
+
         if (
             // git branch needs actually to be the same otherwise we should create a new env var with that new git branch name
             existingVariable.gitBranch === gitBranch &&
@@ -254,7 +253,11 @@ export default class VercelEnvVariabler {
                 existingVariable.type !== type)
         ) {
             info(
-                `Value, target or type for env variable ${existingVariable.key}${gitBranchInfoTextSnippet} has found to have changed, updating value`
+                `Value, target or type for env variable ${
+                    existingVariable.key
+                }${this.gitBranchInfoTextSnippet(
+                    gitBranch
+                )} has found to have changed, updating value`
             );
             const patchResponse = await patchEnvVariable(
                 this.vercelClient,
@@ -264,13 +267,21 @@ export default class VercelEnvVariabler {
             );
             if (patchResponse?.data) {
                 info(
-                    `${existingVariable.key}${gitBranchInfoTextSnippet} updated successfully.`
+                    `${existingVariable.key}${this.gitBranchInfoTextSnippet(
+                        gitBranch
+                    )} updated successfully.`
                 );
             }
         } else {
             info(
-                `No change found for ${existingVariable.key}${gitBranchInfoTextSnippet}, skipping...`
+                `No change found for ${
+                    existingVariable.key
+                }${this.gitBranchInfoTextSnippet(gitBranch)}, skipping...`
             );
         }
+    }
+
+    private gitBranchInfoTextSnippet(gitBranch: string | undefined) {
+        return gitBranch ? ` on git branch '${gitBranch}'` : "";
     }
 }
