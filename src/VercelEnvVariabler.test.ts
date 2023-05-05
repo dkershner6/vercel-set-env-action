@@ -5,6 +5,7 @@ import { AxiosResponse } from "axios";
 import {
     ENV_2_VARIABLE_ID,
     ENV_3_VARIABLE_ID,
+    ENV_6_BRANCH_FOO_VARIABLE_ID,
     mockEnvVariablesResponse,
 } from "./envVariableFixtures";
 
@@ -21,6 +22,9 @@ describe("VercelEnvVariabler", () => {
     const newEnv3Value = "NEW_ENV_3_VALUE";
     const newEnv4Value = "NEW_ENV_4_VALUE";
     const newEnv5Value = "NEW_ENV_5_VALUE";
+    const newEnv6BranchFooValue = "NEW_ENV_6_BRANCH_FOO_VALUE";
+    const env6BranchBarValue = "ENV_6_BRANCH_BAR_VALUE";
+    const env7BranchFeatValue = "ENV_7_BRANCH_FEAT_VALUE";
     beforeAll(() => {
         process.env.ENV_1 = "ENV_1_VALUE";
         process.env.TARGET_ENV_1 = "production,preview,development";
@@ -42,6 +46,16 @@ describe("VercelEnvVariabler", () => {
         process.env.TARGET_ENV_5 = "preview";
         process.env.TYPE_ENV_5 = "plain";
         process.env.GIT_BRANCH_ENV_5 = "feature/foo";
+
+        process.env.ENV_6 = env6BranchBarValue;
+        process.env.TARGET_ENV_6 = "preview";
+        process.env.TYPE_ENV_6 = "plain";
+        process.env.GIT_BRANCH_ENV_6 = "bar";
+
+        process.env.ENV_7 = env7BranchFeatValue;
+        process.env.TARGET_ENV_7 = "preview";
+        process.env.TYPE_ENV_7 = "plain";
+        process.env.GIT_BRANCH_ENV_7 = "feat";
 
         mocked(listEnvVariables).mockResolvedValue({
             data: { envs: mockEnvVariablesResponse },
@@ -208,5 +222,120 @@ describe("VercelEnvVariabler", () => {
 
         expect(mocked(postEnvVariable)).toHaveBeenCalledTimes(1);
         expect(mocked(patchEnvVariable)).toHaveBeenCalledTimes(2);
+    });
+
+    it("Should create ENV_6 for new bar branch and NOT patch ENV_6 for 'old' foo branch", async () => {
+        const variabler = new VercelEnvVariabler(
+            testToken,
+            testProjectName,
+            "ENV_6",
+            testTeamId
+        );
+
+        await variabler.populateExistingEnvVariables();
+        await variabler.processEnvVariables();
+
+        // no patches for (preview) ENV_6 on foo branch...
+        expect(mocked(patchEnvVariable)).not.toHaveBeenCalled();
+        expect(mocked(patchEnvVariable)).not.toHaveBeenCalledWith(
+            expect.anything(),
+            testProjectName,
+            ENV_6_BRANCH_FOO_VARIABLE_ID,
+            expect.objectContaining({
+                value: env6BranchBarValue,
+                target: ["preview"],
+                type: "plain",
+                gitBranch: "bar",
+            })
+        );
+        // ... only a post for (preview) ENV_6 on bar branch
+        expect(mocked(postEnvVariable)).toHaveBeenCalled();
+        expect(mocked(postEnvVariable)).toHaveBeenCalledTimes(1);
+        expect(mocked(postEnvVariable)).toHaveBeenCalledWith(
+            expect.anything(),
+            testProjectName,
+            expect.objectContaining({
+                value: env6BranchBarValue,
+                target: ["preview"],
+                type: "plain",
+                gitBranch: "bar",
+            })
+        );
+    });
+
+    it("Should determine no changes for ENV_6 for foo branch", async () => {
+        // overwrite process.env of ENV_6 for branch bar (set in beforeAll) to old foo branch values (see envVariableFixtures)
+        process.env.ENV_6 = "ENV_6_BRANCH_FOO_VALUE";
+        process.env.TARGET_ENV_6 = "preview";
+        process.env.TYPE_ENV_6 = "encrypted";
+        process.env.GIT_BRANCH_ENV_6 = "foo";
+
+        const variabler = new VercelEnvVariabler(
+            testToken,
+            testProjectName,
+            "ENV_6",
+            testTeamId
+        );
+
+        await variabler.populateExistingEnvVariables();
+        await variabler.processEnvVariables();
+
+        expect(mocked(postEnvVariable)).not.toHaveBeenCalled();
+        expect(mocked(patchEnvVariable)).not.toHaveBeenCalled();
+    });
+
+    it("Should change everything for ENV_6 for foo branch", async () => {
+        // overwrite process.env of ENV_6 for branch bar (set in beforeAll) to update new foo branch value (see envVariableFixtures vs newEnv6BranchFooValue)
+        process.env.ENV_6 = newEnv6BranchFooValue;
+        process.env.TARGET_ENV_6 = "preview";
+        process.env.TYPE_ENV_6 = "encrypted";
+        process.env.GIT_BRANCH_ENV_6 = "foo";
+
+        const variabler = new VercelEnvVariabler(
+            testToken,
+            testProjectName,
+            "ENV_6",
+            testTeamId
+        );
+
+        await variabler.populateExistingEnvVariables();
+        await variabler.processEnvVariables();
+
+        expect(mocked(postEnvVariable)).not.toHaveBeenCalled();
+        expect(mocked(patchEnvVariable)).toHaveBeenCalledWith(
+            expect.anything(),
+            testProjectName,
+            ENV_6_BRANCH_FOO_VARIABLE_ID,
+            expect.objectContaining({
+                value: newEnv6BranchFooValue,
+                target: ["preview"],
+                type: "encrypted",
+                gitBranch: "foo",
+            })
+        );
+    });
+
+    it("Should create ENV_7 (already existing without git branch) for new feat branch", async () => {
+        const variabler = new VercelEnvVariabler(
+            testToken,
+            testProjectName,
+            "ENV_7",
+            testTeamId
+        );
+
+        await variabler.populateExistingEnvVariables();
+        await variabler.processEnvVariables();
+
+        expect(mocked(postEnvVariable)).toHaveBeenCalledWith(
+            expect.anything(),
+            testProjectName,
+            expect.objectContaining({
+                value: env7BranchFeatValue,
+                target: ["preview"],
+                type: "plain",
+                gitBranch: "feat",
+            })
+        );
+        expect(mocked(patchEnvVariable)).not.toHaveBeenCalled();
     });
 });
