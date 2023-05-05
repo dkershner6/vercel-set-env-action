@@ -1,9 +1,8 @@
-require('./sourcemap-register.js');module.exports =
-/******/ (() => { // webpackBootstrap
+require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
 /***/ 689:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
@@ -21,9 +20,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.VALID_TARGETS = exports.VALID_TYPES = void 0;
-const axios_1 = __importDefault(__webpack_require__(6545));
-const core_1 = __webpack_require__(2186);
-const vercel_1 = __webpack_require__(5875);
+const axios_1 = __importDefault(__nccwpck_require__(6545));
+const core_1 = __nccwpck_require__(2186);
+const vercel_1 = __nccwpck_require__(5875);
 exports.VALID_TYPES = ["encrypted", "plain"];
 exports.VALID_TARGETS = [
     vercel_1.VercelEnvVariableTarget.Production,
@@ -85,14 +84,14 @@ class VercelEnvVariabler {
             const existingVariables = targets.reduce((result, target) => {
                 var _a, _b;
                 const existingVariable = (_b = (_a = this.existingEnvVariables) === null || _a === void 0 ? void 0 : _a[target]) === null || _b === void 0 ? void 0 : _b[envVariableKey];
-                if (existingVariable) {
+                if (existingVariable && existingVariable.gitBranch === gitBranch) {
                     result[target] = existingVariable;
                 }
                 return result;
             }, {});
             const existingTargets = Object.keys(existingVariables);
             if (existingTargets.length === 0) {
-                core_1.info(`No existing variable found for ${envVariableKey}, creating.`);
+                core_1.info(`No existing variable found for ${envVariableKey}${this.gitBranchInfoTextSnippet(gitBranch)}, creating.`);
                 yield this.createEnvVariable({
                     key: envVariableKey,
                     value,
@@ -102,7 +101,7 @@ class VercelEnvVariabler {
                 });
             }
             else {
-                core_1.info(`Existing variable found for ${envVariableKey}, comparing values.`);
+                core_1.info(`Existing variable found for ${envVariableKey}${this.gitBranchInfoTextSnippet(gitBranch)}, comparing values.`);
                 yield this.processPossibleEnvVariableUpdate({
                     value,
                     targets,
@@ -147,36 +146,41 @@ class VercelEnvVariabler {
         return __awaiter(this, void 0, void 0, function* () {
             const createResponse = yield vercel_1.postEnvVariable(this.vercelClient, this.projectName, { type, key, value, target: targets, gitBranch });
             if (!(createResponse === null || createResponse === void 0 ? void 0 : createResponse.data)) {
-                core_1.info(`Variable ${key} with targets ${targets.join(",")} created successfully`);
+                core_1.info(`Variable ${key}${this.gitBranchInfoTextSnippet(gitBranch)} with targets ${targets.join(",")} created successfully`);
             }
         });
     }
     processPossibleEnvVariableUpdate({ type, value, targets, existingVariables, gitBranch, }) {
         return __awaiter(this, void 0, void 0, function* () {
             const existingVariable = Object.values(existingVariables)[0]; // They are all actually the same
-            if (existingVariable.value !== value ||
-                existingVariable.target.length !== targets.length ||
-                existingVariable.type !== type ||
-                existingVariable.gitBranch !== gitBranch) {
-                core_1.info(`Value, target, type or gitBranch for env variable ${existingVariable.key} has found to have changed, updating value`);
+            if (
+            // git branch needs actually to be the same otherwise we should create a new env var with that new git branch name
+            existingVariable.gitBranch === gitBranch &&
+                (existingVariable.value !== value ||
+                    existingVariable.target.length !== targets.length ||
+                    existingVariable.type !== type)) {
+                core_1.info(`Value, target or type for env variable ${existingVariable.key}${this.gitBranchInfoTextSnippet(gitBranch)} has found to have changed, updating value`);
                 const patchResponse = yield vercel_1.patchEnvVariable(this.vercelClient, this.projectName, existingVariable.id, { type, value, target: targets, gitBranch });
                 if (patchResponse === null || patchResponse === void 0 ? void 0 : patchResponse.data) {
-                    core_1.info(`${existingVariable.key} updated successfully.`);
+                    core_1.info(`${existingVariable.key}${this.gitBranchInfoTextSnippet(gitBranch)} updated successfully.`);
                 }
             }
             else {
-                core_1.info(`No change found for ${existingVariable.key}, skipping...`);
+                core_1.info(`No change found for ${existingVariable.key}${this.gitBranchInfoTextSnippet(gitBranch)}, skipping...`);
             }
         });
     }
+    gitBranchInfoTextSnippet(gitBranch) {
+        return gitBranch ? ` on git branch '${gitBranch}'` : "";
+    }
 }
-exports.default = VercelEnvVariabler;
+exports["default"] = VercelEnvVariabler;
 
 
 /***/ }),
 
 /***/ 3109:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
@@ -193,8 +197,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core_1 = __webpack_require__(2186);
-const VercelEnvVariabler_1 = __importDefault(__webpack_require__(689));
+const core_1 = __nccwpck_require__(2186);
+const VercelEnvVariabler_1 = __importDefault(__nccwpck_require__(689));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -263,7 +267,7 @@ exports.patchEnvVariable = patchEnvVariable;
 /***/ }),
 
 /***/ 7351:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
@@ -275,8 +279,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const os = __importStar(__webpack_require__(2087));
-const utils_1 = __webpack_require__(5278);
+const os = __importStar(__nccwpck_require__(2037));
+const utils_1 = __nccwpck_require__(5278);
 /**
  * Commands
  *
@@ -349,7 +353,7 @@ function escapeProperty(s) {
 /***/ }),
 
 /***/ 2186:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
@@ -370,11 +374,11 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const command_1 = __webpack_require__(7351);
-const file_command_1 = __webpack_require__(717);
-const utils_1 = __webpack_require__(5278);
-const os = __importStar(__webpack_require__(2087));
-const path = __importStar(__webpack_require__(5622));
+const command_1 = __nccwpck_require__(7351);
+const file_command_1 = __nccwpck_require__(717);
+const utils_1 = __nccwpck_require__(5278);
+const os = __importStar(__nccwpck_require__(2037));
+const path = __importStar(__nccwpck_require__(1017));
 /**
  * The code to exit an action
  */
@@ -594,7 +598,7 @@ exports.getState = getState;
 /***/ }),
 
 /***/ 717:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
@@ -609,9 +613,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 // We use any as a valid input type
 /* eslint-disable @typescript-eslint/no-explicit-any */
-const fs = __importStar(__webpack_require__(5747));
-const os = __importStar(__webpack_require__(2087));
-const utils_1 = __webpack_require__(5278);
+const fs = __importStar(__nccwpck_require__(7147));
+const os = __importStar(__nccwpck_require__(2037));
+const utils_1 = __nccwpck_require__(5278);
 function issueCommand(command, message) {
     const filePath = process.env[`GITHUB_${command}`];
     if (!filePath) {
@@ -656,31 +660,31 @@ exports.toCommandValue = toCommandValue;
 /***/ }),
 
 /***/ 6545:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-module.exports = __webpack_require__(2618);
+module.exports = __nccwpck_require__(2618);
 
 /***/ }),
 
 /***/ 8104:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
-var utils = __webpack_require__(328);
-var settle = __webpack_require__(3211);
-var buildFullPath = __webpack_require__(1934);
-var buildURL = __webpack_require__(646);
-var http = __webpack_require__(8605);
-var https = __webpack_require__(7211);
-var httpFollow = __webpack_require__(7707).http;
-var httpsFollow = __webpack_require__(7707).https;
-var url = __webpack_require__(8835);
-var zlib = __webpack_require__(8761);
-var pkg = __webpack_require__(696);
-var createError = __webpack_require__(5226);
-var enhanceError = __webpack_require__(1516);
+var utils = __nccwpck_require__(328);
+var settle = __nccwpck_require__(3211);
+var buildFullPath = __nccwpck_require__(1934);
+var buildURL = __nccwpck_require__(646);
+var http = __nccwpck_require__(3685);
+var https = __nccwpck_require__(5687);
+var httpFollow = (__nccwpck_require__(7707).http);
+var httpsFollow = (__nccwpck_require__(7707).https);
+var url = __nccwpck_require__(7310);
+var zlib = __nccwpck_require__(9796);
+var pkg = __nccwpck_require__(8593);
+var createError = __nccwpck_require__(5226);
+var enhanceError = __nccwpck_require__(1516);
 
 var isHttps = /https:?/;
 
@@ -974,19 +978,19 @@ module.exports = function httpAdapter(config) {
 /***/ }),
 
 /***/ 3454:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
-var utils = __webpack_require__(328);
-var settle = __webpack_require__(3211);
-var cookies = __webpack_require__(1545);
-var buildURL = __webpack_require__(646);
-var buildFullPath = __webpack_require__(1934);
-var parseHeaders = __webpack_require__(6455);
-var isURLSameOrigin = __webpack_require__(3608);
-var createError = __webpack_require__(5226);
+var utils = __nccwpck_require__(328);
+var settle = __nccwpck_require__(3211);
+var cookies = __nccwpck_require__(1545);
+var buildURL = __nccwpck_require__(646);
+var buildFullPath = __nccwpck_require__(1934);
+var parseHeaders = __nccwpck_require__(6455);
+var isURLSameOrigin = __nccwpck_require__(3608);
+var createError = __nccwpck_require__(5226);
 
 module.exports = function xhrAdapter(config) {
   return new Promise(function dispatchXhrRequest(resolve, reject) {
@@ -1161,16 +1165,16 @@ module.exports = function xhrAdapter(config) {
 /***/ }),
 
 /***/ 2618:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
-var utils = __webpack_require__(328);
-var bind = __webpack_require__(7065);
-var Axios = __webpack_require__(8178);
-var mergeConfig = __webpack_require__(4831);
-var defaults = __webpack_require__(8190);
+var utils = __nccwpck_require__(328);
+var bind = __nccwpck_require__(7065);
+var Axios = __nccwpck_require__(8178);
+var mergeConfig = __nccwpck_require__(4831);
+var defaults = __nccwpck_require__(8190);
 
 /**
  * Create an instance of Axios
@@ -1203,23 +1207,23 @@ axios.create = function create(instanceConfig) {
 };
 
 // Expose Cancel & CancelToken
-axios.Cancel = __webpack_require__(8875);
-axios.CancelToken = __webpack_require__(1587);
-axios.isCancel = __webpack_require__(4057);
+axios.Cancel = __nccwpck_require__(8875);
+axios.CancelToken = __nccwpck_require__(1587);
+axios.isCancel = __nccwpck_require__(4057);
 
 // Expose all/spread
 axios.all = function all(promises) {
   return Promise.all(promises);
 };
-axios.spread = __webpack_require__(4850);
+axios.spread = __nccwpck_require__(4850);
 
 // Expose isAxiosError
-axios.isAxiosError = __webpack_require__(650);
+axios.isAxiosError = __nccwpck_require__(650);
 
 module.exports = axios;
 
 // Allow use of default import syntax in TypeScript
-module.exports.default = axios;
+module.exports["default"] = axios;
 
 
 /***/ }),
@@ -1252,12 +1256,12 @@ module.exports = Cancel;
 /***/ }),
 
 /***/ 1587:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
-var Cancel = __webpack_require__(8875);
+var Cancel = __nccwpck_require__(8875);
 
 /**
  * A `CancelToken` is an object that can be used to request cancellation of an operation.
@@ -1330,16 +1334,16 @@ module.exports = function isCancel(value) {
 /***/ }),
 
 /***/ 8178:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
-var utils = __webpack_require__(328);
-var buildURL = __webpack_require__(646);
-var InterceptorManager = __webpack_require__(3214);
-var dispatchRequest = __webpack_require__(5062);
-var mergeConfig = __webpack_require__(4831);
+var utils = __nccwpck_require__(328);
+var buildURL = __nccwpck_require__(646);
+var InterceptorManager = __nccwpck_require__(3214);
+var dispatchRequest = __nccwpck_require__(5062);
+var mergeConfig = __nccwpck_require__(4831);
 
 /**
  * Create a new instance of Axios
@@ -1433,12 +1437,12 @@ module.exports = Axios;
 /***/ }),
 
 /***/ 3214:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
-var utils = __webpack_require__(328);
+var utils = __nccwpck_require__(328);
 
 function InterceptorManager() {
   this.handlers = [];
@@ -1493,13 +1497,13 @@ module.exports = InterceptorManager;
 /***/ }),
 
 /***/ 1934:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
-var isAbsoluteURL = __webpack_require__(1301);
-var combineURLs = __webpack_require__(7189);
+var isAbsoluteURL = __nccwpck_require__(1301);
+var combineURLs = __nccwpck_require__(7189);
 
 /**
  * Creates a new URL by combining the baseURL with the requestedURL,
@@ -1521,12 +1525,12 @@ module.exports = function buildFullPath(baseURL, requestedURL) {
 /***/ }),
 
 /***/ 5226:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
-var enhanceError = __webpack_require__(1516);
+var enhanceError = __nccwpck_require__(1516);
 
 /**
  * Create an Error with the specified message, config, error code, request and response.
@@ -1547,15 +1551,15 @@ module.exports = function createError(message, config, code, request, response) 
 /***/ }),
 
 /***/ 5062:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
-var utils = __webpack_require__(328);
-var transformData = __webpack_require__(9812);
-var isCancel = __webpack_require__(4057);
-var defaults = __webpack_require__(8190);
+var utils = __nccwpck_require__(328);
+var transformData = __nccwpck_require__(9812);
+var isCancel = __nccwpck_require__(4057);
+var defaults = __nccwpck_require__(8190);
 
 /**
  * Throws a `Cancel` if cancellation has been requested.
@@ -1684,12 +1688,12 @@ module.exports = function enhanceError(error, config, code, request, response) {
 /***/ }),
 
 /***/ 4831:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
-var utils = __webpack_require__(328);
+var utils = __nccwpck_require__(328);
 
 /**
  * Config-specific merge-function which creates a new config-object
@@ -1779,12 +1783,12 @@ module.exports = function mergeConfig(config1, config2) {
 /***/ }),
 
 /***/ 3211:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
-var createError = __webpack_require__(5226);
+var createError = __nccwpck_require__(5226);
 
 /**
  * Resolve or reject a Promise based on response status.
@@ -1812,12 +1816,12 @@ module.exports = function settle(resolve, reject, response) {
 /***/ }),
 
 /***/ 9812:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
-var utils = __webpack_require__(328);
+var utils = __nccwpck_require__(328);
 
 /**
  * Transform the data for a request or a response
@@ -1840,13 +1844,13 @@ module.exports = function transformData(data, headers, fns) {
 /***/ }),
 
 /***/ 8190:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
-var utils = __webpack_require__(328);
-var normalizeHeaderName = __webpack_require__(6240);
+var utils = __nccwpck_require__(328);
+var normalizeHeaderName = __nccwpck_require__(6240);
 
 var DEFAULT_CONTENT_TYPE = {
   'Content-Type': 'application/x-www-form-urlencoded'
@@ -1862,10 +1866,10 @@ function getDefaultAdapter() {
   var adapter;
   if (typeof XMLHttpRequest !== 'undefined') {
     // For browsers use XHR adapter
-    adapter = __webpack_require__(3454);
+    adapter = __nccwpck_require__(3454);
   } else if (typeof process !== 'undefined' && Object.prototype.toString.call(process) === '[object process]') {
     // For node use HTTP adapter
-    adapter = __webpack_require__(8104);
+    adapter = __nccwpck_require__(8104);
   }
   return adapter;
 }
@@ -1965,12 +1969,12 @@ module.exports = function bind(fn, thisArg) {
 /***/ }),
 
 /***/ 646:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
-var utils = __webpack_require__(328);
+var utils = __nccwpck_require__(328);
 
 function encode(val) {
   return encodeURIComponent(val).
@@ -2065,12 +2069,12 @@ module.exports = function combineURLs(baseURL, relativeURL) {
 /***/ }),
 
 /***/ 1545:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
-var utils = __webpack_require__(328);
+var utils = __nccwpck_require__(328);
 
 module.exports = (
   utils.isStandardBrowserEnv() ?
@@ -2167,12 +2171,12 @@ module.exports = function isAxiosError(payload) {
 /***/ }),
 
 /***/ 3608:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
-var utils = __webpack_require__(328);
+var utils = __nccwpck_require__(328);
 
 module.exports = (
   utils.isStandardBrowserEnv() ?
@@ -2243,12 +2247,12 @@ module.exports = (
 /***/ }),
 
 /***/ 6240:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
-var utils = __webpack_require__(328);
+var utils = __nccwpck_require__(328);
 
 module.exports = function normalizeHeaderName(headers, normalizedName) {
   utils.forEach(headers, function processHeader(value, name) {
@@ -2263,12 +2267,12 @@ module.exports = function normalizeHeaderName(headers, normalizedName) {
 /***/ }),
 
 /***/ 6455:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
-var utils = __webpack_require__(328);
+var utils = __nccwpck_require__(328);
 
 // Headers whose duplicates are ignored by node
 // c.f. https://nodejs.org/api/http.html#http_message_headers
@@ -2359,12 +2363,12 @@ module.exports = function spread(callback) {
 /***/ }),
 
 /***/ 328:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
-var bind = __webpack_require__(7065);
+var bind = __nccwpck_require__(7065);
 
 /*global toString:true*/
 
@@ -2718,7 +2722,7 @@ module.exports = {
 /***/ }),
 
 /***/ 8222:
-/***/ ((module, exports, __webpack_require__) => {
+/***/ ((module, exports, __nccwpck_require__) => {
 
 /* eslint-env browser */
 
@@ -2969,7 +2973,7 @@ function localstorage() {
 	}
 }
 
-module.exports = __webpack_require__(6243)(exports);
+module.exports = __nccwpck_require__(6243)(exports);
 
 const {formatters} = module.exports;
 
@@ -2989,7 +2993,7 @@ formatters.j = function (v) {
 /***/ }),
 
 /***/ 6243:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 /**
@@ -3004,7 +3008,7 @@ function setup(env) {
 	createDebug.disable = disable;
 	createDebug.enable = enable;
 	createDebug.enabled = enabled;
-	createDebug.humanize = __webpack_require__(900);
+	createDebug.humanize = __nccwpck_require__(900);
 
 	Object.keys(env).forEach(key => {
 		createDebug[key] = env[key];
@@ -3262,7 +3266,7 @@ module.exports = setup;
 /***/ }),
 
 /***/ 8237:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 /**
  * Detect Electron renderer / nwjs process, which is node, but we should
@@ -3270,23 +3274,23 @@ module.exports = setup;
  */
 
 if (typeof process === 'undefined' || process.type === 'renderer' || process.browser === true || process.__nwjs) {
-	module.exports = __webpack_require__(8222);
+	module.exports = __nccwpck_require__(8222);
 } else {
-	module.exports = __webpack_require__(5332);
+	module.exports = __nccwpck_require__(5332);
 }
 
 
 /***/ }),
 
 /***/ 5332:
-/***/ ((module, exports, __webpack_require__) => {
+/***/ ((module, exports, __nccwpck_require__) => {
 
 /**
  * Module dependencies.
  */
 
-const tty = __webpack_require__(3867);
-const util = __webpack_require__(1669);
+const tty = __nccwpck_require__(6224);
+const util = __nccwpck_require__(3837);
 
 /**
  * This is the Node.js implementation of `debug()`.
@@ -3308,7 +3312,7 @@ exports.colors = [6, 2, 3, 4, 5, 1];
 try {
 	// Optional dependency (as in, doesn't need to be installed, NOT like optionalDependencies in package.json)
 	// eslint-disable-next-line import/no-extraneous-dependencies
-	const supportsColor = __webpack_require__(9318);
+	const supportsColor = __nccwpck_require__(9318);
 
 	if (supportsColor && (supportsColor.stderr || supportsColor).level >= 2) {
 		exports.colors = [
@@ -3516,7 +3520,7 @@ function init(debug) {
 	}
 }
 
-module.exports = __webpack_require__(6243)(exports);
+module.exports = __nccwpck_require__(6243)(exports);
 
 const {formatters} = module.exports;
 
@@ -3543,7 +3547,7 @@ formatters.O = function (v) {
 /***/ }),
 
 /***/ 1133:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 var debug;
 
@@ -3551,7 +3555,7 @@ module.exports = function () {
   if (!debug) {
     try {
       /* eslint global-require: off */
-      debug = __webpack_require__(8237)("follow-redirects");
+      debug = __nccwpck_require__(8237)("follow-redirects");
     }
     catch (error) {
       debug = function () { /* */ };
@@ -3564,15 +3568,15 @@ module.exports = function () {
 /***/ }),
 
 /***/ 7707:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var url = __webpack_require__(8835);
+var url = __nccwpck_require__(7310);
 var URL = url.URL;
-var http = __webpack_require__(8605);
-var https = __webpack_require__(7211);
-var Writable = __webpack_require__(2413).Writable;
-var assert = __webpack_require__(2357);
-var debug = __webpack_require__(1133);
+var http = __nccwpck_require__(3685);
+var https = __nccwpck_require__(5687);
+var Writable = (__nccwpck_require__(2781).Writable);
+var assert = __nccwpck_require__(9491);
+var debug = __nccwpck_require__(1133);
 
 // Create handlers that pass events from native requests
 var events = ["abort", "aborted", "connect", "error", "socket", "timeout"];
@@ -4271,13 +4275,13 @@ function plural(ms, msAbs, n, name) {
 /***/ }),
 
 /***/ 9318:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
-const os = __webpack_require__(2087);
-const tty = __webpack_require__(3867);
-const hasFlag = __webpack_require__(1533);
+const os = __nccwpck_require__(2037);
+const tty = __nccwpck_require__(6224);
+const hasFlag = __nccwpck_require__(1533);
 
 const {env} = process;
 
@@ -4433,99 +4437,99 @@ module.exports = (flag, argv = process.argv) => {
 
 /***/ }),
 
-/***/ 696:
+/***/ 9491:
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse("{\"name\":\"axios\",\"version\":\"0.21.1\",\"description\":\"Promise based HTTP client for the browser and node.js\",\"main\":\"index.js\",\"scripts\":{\"test\":\"grunt test && bundlesize\",\"start\":\"node ./sandbox/server.js\",\"build\":\"NODE_ENV=production grunt build\",\"preversion\":\"npm test\",\"version\":\"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json\",\"postversion\":\"git push && git push --tags\",\"examples\":\"node ./examples/server.js\",\"coveralls\":\"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js\",\"fix\":\"eslint --fix lib/**/*.js\"},\"repository\":{\"type\":\"git\",\"url\":\"https://github.com/axios/axios.git\"},\"keywords\":[\"xhr\",\"http\",\"ajax\",\"promise\",\"node\"],\"author\":\"Matt Zabriskie\",\"license\":\"MIT\",\"bugs\":{\"url\":\"https://github.com/axios/axios/issues\"},\"homepage\":\"https://github.com/axios/axios\",\"devDependencies\":{\"bundlesize\":\"^0.17.0\",\"coveralls\":\"^3.0.0\",\"es6-promise\":\"^4.2.4\",\"grunt\":\"^1.0.2\",\"grunt-banner\":\"^0.6.0\",\"grunt-cli\":\"^1.2.0\",\"grunt-contrib-clean\":\"^1.1.0\",\"grunt-contrib-watch\":\"^1.0.0\",\"grunt-eslint\":\"^20.1.0\",\"grunt-karma\":\"^2.0.0\",\"grunt-mocha-test\":\"^0.13.3\",\"grunt-ts\":\"^6.0.0-beta.19\",\"grunt-webpack\":\"^1.0.18\",\"istanbul-instrumenter-loader\":\"^1.0.0\",\"jasmine-core\":\"^2.4.1\",\"karma\":\"^1.3.0\",\"karma-chrome-launcher\":\"^2.2.0\",\"karma-coverage\":\"^1.1.1\",\"karma-firefox-launcher\":\"^1.1.0\",\"karma-jasmine\":\"^1.1.1\",\"karma-jasmine-ajax\":\"^0.1.13\",\"karma-opera-launcher\":\"^1.0.0\",\"karma-safari-launcher\":\"^1.0.0\",\"karma-sauce-launcher\":\"^1.2.0\",\"karma-sinon\":\"^1.0.5\",\"karma-sourcemap-loader\":\"^0.3.7\",\"karma-webpack\":\"^1.7.0\",\"load-grunt-tasks\":\"^3.5.2\",\"minimist\":\"^1.2.0\",\"mocha\":\"^5.2.0\",\"sinon\":\"^4.5.0\",\"typescript\":\"^2.8.1\",\"url-search-params\":\"^0.10.0\",\"webpack\":\"^1.13.1\",\"webpack-dev-server\":\"^1.14.1\"},\"browser\":{\"./lib/adapters/http.js\":\"./lib/adapters/xhr.js\"},\"jsdelivr\":\"dist/axios.min.js\",\"unpkg\":\"dist/axios.min.js\",\"typings\":\"./index.d.ts\",\"dependencies\":{\"follow-redirects\":\"^1.10.0\"},\"bundlesize\":[{\"path\":\"./dist/axios.min.js\",\"threshold\":\"5kB\"}]}");
+module.exports = require("assert");
 
 /***/ }),
 
-/***/ 2357:
+/***/ 7147:
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("assert");;
+module.exports = require("fs");
 
 /***/ }),
 
-/***/ 5747:
+/***/ 3685:
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("fs");;
+module.exports = require("http");
 
 /***/ }),
 
-/***/ 8605:
+/***/ 5687:
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("http");;
+module.exports = require("https");
 
 /***/ }),
 
-/***/ 7211:
+/***/ 2037:
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("https");;
+module.exports = require("os");
 
 /***/ }),
 
-/***/ 2087:
+/***/ 1017:
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("os");;
+module.exports = require("path");
 
 /***/ }),
 
-/***/ 5622:
+/***/ 2781:
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("path");;
+module.exports = require("stream");
 
 /***/ }),
 
-/***/ 2413:
+/***/ 6224:
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("stream");;
+module.exports = require("tty");
 
 /***/ }),
 
-/***/ 3867:
+/***/ 7310:
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("tty");;
+module.exports = require("url");
 
 /***/ }),
 
-/***/ 8835:
+/***/ 3837:
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("url");;
+module.exports = require("util");
 
 /***/ }),
 
-/***/ 1669:
+/***/ 9796:
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("util");;
+module.exports = require("zlib");
 
 /***/ }),
 
-/***/ 8761:
+/***/ 8593:
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("zlib");;
+module.exports = JSON.parse('{"name":"axios","version":"0.21.1","description":"Promise based HTTP client for the browser and node.js","main":"index.js","scripts":{"test":"grunt test && bundlesize","start":"node ./sandbox/server.js","build":"NODE_ENV=production grunt build","preversion":"npm test","version":"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json","postversion":"git push && git push --tags","examples":"node ./examples/server.js","coveralls":"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js","fix":"eslint --fix lib/**/*.js"},"repository":{"type":"git","url":"https://github.com/axios/axios.git"},"keywords":["xhr","http","ajax","promise","node"],"author":"Matt Zabriskie","license":"MIT","bugs":{"url":"https://github.com/axios/axios/issues"},"homepage":"https://github.com/axios/axios","devDependencies":{"bundlesize":"^0.17.0","coveralls":"^3.0.0","es6-promise":"^4.2.4","grunt":"^1.0.2","grunt-banner":"^0.6.0","grunt-cli":"^1.2.0","grunt-contrib-clean":"^1.1.0","grunt-contrib-watch":"^1.0.0","grunt-eslint":"^20.1.0","grunt-karma":"^2.0.0","grunt-mocha-test":"^0.13.3","grunt-ts":"^6.0.0-beta.19","grunt-webpack":"^1.0.18","istanbul-instrumenter-loader":"^1.0.0","jasmine-core":"^2.4.1","karma":"^1.3.0","karma-chrome-launcher":"^2.2.0","karma-coverage":"^1.1.1","karma-firefox-launcher":"^1.1.0","karma-jasmine":"^1.1.1","karma-jasmine-ajax":"^0.1.13","karma-opera-launcher":"^1.0.0","karma-safari-launcher":"^1.0.0","karma-sauce-launcher":"^1.2.0","karma-sinon":"^1.0.5","karma-sourcemap-loader":"^0.3.7","karma-webpack":"^1.7.0","load-grunt-tasks":"^3.5.2","minimist":"^1.2.0","mocha":"^5.2.0","sinon":"^4.5.0","typescript":"^2.8.1","url-search-params":"^0.10.0","webpack":"^1.13.1","webpack-dev-server":"^1.14.1"},"browser":{"./lib/adapters/http.js":"./lib/adapters/xhr.js"},"jsdelivr":"dist/axios.min.js","unpkg":"dist/axios.min.js","typings":"./index.d.ts","dependencies":{"follow-redirects":"^1.10.0"},"bundlesize":[{"path":"./dist/axios.min.js","threshold":"5kB"}]}');
 
 /***/ })
 
@@ -4535,10 +4539,11 @@ module.exports = require("zlib");;
 /******/ 	var __webpack_module_cache__ = {};
 /******/ 	
 /******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
+/******/ 	function __nccwpck_require__(moduleId) {
 /******/ 		// Check if module is in cache
-/******/ 		if(__webpack_module_cache__[moduleId]) {
-/******/ 			return __webpack_module_cache__[moduleId].exports;
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
 /******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = __webpack_module_cache__[moduleId] = {
@@ -4550,7 +4555,7 @@ module.exports = require("zlib");;
 /******/ 		// Execute the module function
 /******/ 		var threw = true;
 /******/ 		try {
-/******/ 			__webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/ 			__webpack_modules__[moduleId].call(module.exports, module, module.exports, __nccwpck_require__);
 /******/ 			threw = false;
 /******/ 		} finally {
 /******/ 			if(threw) delete __webpack_module_cache__[moduleId];
@@ -4563,11 +4568,16 @@ module.exports = require("zlib");;
 /************************************************************************/
 /******/ 	/* webpack/runtime/compat */
 /******/ 	
-/******/ 	__webpack_require__.ab = __dirname + "/";/************************************************************************/
-/******/ 	// module exports must be returned from runtime so entry inlining is disabled
+/******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
+/******/ 	
+/************************************************************************/
+/******/ 	
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(3109);
+/******/ 	// This entry module is referenced by other modules so it can't be inlined
+/******/ 	var __webpack_exports__ = __nccwpck_require__(3109);
+/******/ 	module.exports = __webpack_exports__;
+/******/ 	
 /******/ })()
 ;
 //# sourceMappingURL=index.js.map
