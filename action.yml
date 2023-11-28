@@ -15,7 +15,7 @@ inputs:
     required: true
     description: "A comma delimited list of environment variable keys. This must be accompanied by a matching env variable and ones prefixed with TARGET_ and TYPE_. These match target and type in Vercel."
 runs:
-  using: "node12"
+  using: "node18"
   main: "dist/index.js"
 branding:
   icon: anchor
