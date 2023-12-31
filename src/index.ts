@@ -15,15 +15,15 @@ async function run(): Promise<void> {
             token,
             projectName,
             envVariableKeys,
-            teamId
+            teamId,
         );
 
         await envVariabler.populateExistingEnvVariables();
         await envVariabler.processEnvVariables();
         info("Vercel env variables completed successfully");
     } catch (error) {
-        setFailed(error.message);
+        setFailed((error as Error)?.message);
     }
 }
 
-run();
+void run();

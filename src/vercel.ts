@@ -25,13 +25,13 @@ export interface VercelEnvVariable {
 
 export const listEnvVariables = async (
     vercelClient: AxiosInstance,
-    projectName: string
+    projectName: string,
 ): Promise<
     AxiosResponse<{
         envs: VercelEnvVariable[];
     }>
 > => {
-    return await vercelClient.get<{
+    return vercelClient.get<{
         envs: VercelEnvVariable[];
     }>(`/projects/${projectName}/env`, {
         params: {
@@ -43,19 +43,19 @@ export const listEnvVariables = async (
 export const postEnvVariable = async (
     vercelClient: AxiosInstance,
     projectName: string,
-    envVariable: Partial<VercelEnvVariable>
+    envVariable: Partial<VercelEnvVariable>,
 ): Promise<AxiosResponse<{ env: VercelEnvVariable }>> => {
-    return await vercelClient.post(`/projects/${projectName}/env`, envVariable);
+    return vercelClient.post(`/projects/${projectName}/env`, envVariable);
 };
 
 export const patchEnvVariable = async (
     vercelClient: AxiosInstance,
     projectName: string,
     envVariableId: string,
-    envVariable: Partial<VercelEnvVariable>
+    envVariable: Partial<VercelEnvVariable>,
 ): Promise<AxiosResponse<{ env: VercelEnvVariable }>> => {
-    return await vercelClient.patch(
+    return vercelClient.patch(
         `/projects/${projectName}/env/${envVariableId}`,
-        envVariable
+        envVariable,
     );
 };
