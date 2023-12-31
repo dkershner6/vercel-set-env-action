@@ -1,18 +1,19 @@
-import { mocked } from "ts-jest/dist/utils/testing";
-import VercelEnvVariabler, { VALID_TARGETS } from "./VercelEnvVariabler";
-import { listEnvVariables, patchEnvVariable, postEnvVariable } from "./vercel";
+/* eslint-disable sonarjs/no-duplicate-string */
 import { AxiosResponse } from "axios";
+import { mocked } from "jest-mock";
 import {
     ENV_2_VARIABLE_ID,
     ENV_3_VARIABLE_ID,
     ENV_6_BRANCH_FOO_VARIABLE_ID,
     mockEnvVariablesResponse,
 } from "./envVariableFixtures";
+import { listEnvVariables, patchEnvVariable, postEnvVariable } from "./vercel";
+import VercelEnvVariabler, { VALID_TARGETS } from "./VercelEnvVariabler";
 
-jest.mock("./vercel.ts", () => {
-    const actualModule = jest.requireActual("./vercel.ts");
+jest.mock("./vercel", () => {
+    const actualModule = jest.requireActual("./vercel");
     return {
-        ...jest.genMockFromModule<typeof actualModule>("./vercel.ts"),
+        ...jest.createMockFromModule<typeof actualModule>("./vercel.ts"),
         VercelEnvVariableTarget: actualModule.VercelEnvVariableTarget,
     };
 });
@@ -76,7 +77,7 @@ describe("VercelEnvVariabler", () => {
             testToken,
             testProjectName,
             testAllEnvKeys,
-            testTeamId
+            testTeamId,
         );
 
         expect(variabler).toBeInstanceOf(VercelEnvVariabler);
@@ -87,7 +88,7 @@ describe("VercelEnvVariabler", () => {
             testToken,
             testProjectName,
             testAllEnvKeys,
-            testTeamId
+            testTeamId,
         );
 
         await variabler.populateExistingEnvVariables();
@@ -95,7 +96,7 @@ describe("VercelEnvVariabler", () => {
         expect(mocked(listEnvVariables)).toHaveBeenCalledTimes(1);
         expect(mocked(listEnvVariables)).toHaveBeenCalledWith(
             expect.anything(),
-            testProjectName
+            testProjectName,
         );
     });
 
@@ -104,7 +105,7 @@ describe("VercelEnvVariabler", () => {
             testToken,
             testProjectName,
             "ENV_1",
-            testTeamId
+            testTeamId,
         );
 
         await variabler.populateExistingEnvVariables();
@@ -119,7 +120,7 @@ describe("VercelEnvVariabler", () => {
             testToken,
             testProjectName,
             "ENV_2",
-            testTeamId
+            testTeamId,
         );
 
         await variabler.populateExistingEnvVariables();
@@ -134,7 +135,7 @@ describe("VercelEnvVariabler", () => {
                 value: newEnv2Value,
                 target: VALID_TARGETS,
                 type: "encrypted",
-            })
+            }),
         );
     });
 
@@ -143,7 +144,7 @@ describe("VercelEnvVariabler", () => {
             testToken,
             testProjectName,
             "ENV_3",
-            testTeamId
+            testTeamId,
         );
 
         await variabler.populateExistingEnvVariables();
@@ -158,7 +159,7 @@ describe("VercelEnvVariabler", () => {
                 value: newEnv3Value,
                 target: ["production"],
                 type: "encrypted",
-            })
+            }),
         );
     });
 
@@ -167,7 +168,7 @@ describe("VercelEnvVariabler", () => {
             testToken,
             testProjectName,
             "ENV_4",
-            testTeamId
+            testTeamId,
         );
 
         await variabler.populateExistingEnvVariables();
@@ -180,7 +181,7 @@ describe("VercelEnvVariabler", () => {
                 value: newEnv4Value,
                 target: VALID_TARGETS,
                 type: "plain",
-            })
+            }),
         );
         expect(mocked(patchEnvVariable)).not.toHaveBeenCalled();
     });
@@ -190,7 +191,7 @@ describe("VercelEnvVariabler", () => {
             testToken,
             testProjectName,
             "ENV_5",
-            testTeamId
+            testTeamId,
         );
 
         await variabler.populateExistingEnvVariables();
@@ -204,7 +205,7 @@ describe("VercelEnvVariabler", () => {
                 target: ["preview"],
                 type: "plain",
                 gitBranch: "feature/foo",
-            })
+            }),
         );
         expect(mocked(patchEnvVariable)).not.toHaveBeenCalled();
     });
@@ -214,7 +215,7 @@ describe("VercelEnvVariabler", () => {
             testToken,
             testProjectName,
             testAllEnvKeys,
-            testTeamId
+            testTeamId,
         );
 
         await variabler.populateExistingEnvVariables();
@@ -229,7 +230,7 @@ describe("VercelEnvVariabler", () => {
             testToken,
             testProjectName,
             "ENV_6",
-            testTeamId
+            testTeamId,
         );
 
         await variabler.populateExistingEnvVariables();
@@ -246,7 +247,7 @@ describe("VercelEnvVariabler", () => {
                 target: ["preview"],
                 type: "plain",
                 gitBranch: "bar",
-            })
+            }),
         );
         // ... only a post for (preview) ENV_6 on bar branch
         expect(mocked(postEnvVariable)).toHaveBeenCalled();
@@ -259,7 +260,7 @@ describe("VercelEnvVariabler", () => {
                 target: ["preview"],
                 type: "plain",
                 gitBranch: "bar",
-            })
+            }),
         );
     });
 
@@ -274,7 +275,7 @@ describe("VercelEnvVariabler", () => {
             testToken,
             testProjectName,
             "ENV_6",
-            testTeamId
+            testTeamId,
         );
 
         await variabler.populateExistingEnvVariables();
@@ -295,7 +296,7 @@ describe("VercelEnvVariabler", () => {
             testToken,
             testProjectName,
             "ENV_6",
-            testTeamId
+            testTeamId,
         );
 
         await variabler.populateExistingEnvVariables();
@@ -311,7 +312,7 @@ describe("VercelEnvVariabler", () => {
                 target: ["preview"],
                 type: "encrypted",
                 gitBranch: "foo",
-            })
+            }),
         );
     });
 
@@ -320,7 +321,7 @@ describe("VercelEnvVariabler", () => {
             testToken,
             testProjectName,
             "ENV_7",
-            testTeamId
+            testTeamId,
         );
 
         await variabler.populateExistingEnvVariables();
@@ -334,7 +335,7 @@ describe("VercelEnvVariabler", () => {
                 target: ["preview"],
                 type: "plain",
                 gitBranch: "feat",
-            })
+            }),
         );
         expect(mocked(patchEnvVariable)).not.toHaveBeenCalled();
     });
