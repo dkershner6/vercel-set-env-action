@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set Env Vars on Vercel Project
-        uses: dkershner6/vercel-set-env-action@v2
+        uses: dkershner6/vercel-set-env-action@v3
         with:
           token: ${{ secrets.VERCEL_API_TOKEN }}
           teamId: ${{ secrets.VERCEL_TEAM_ID }} # optional, without will use personal
