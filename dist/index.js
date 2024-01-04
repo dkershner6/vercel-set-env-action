@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.VALID_TARGETS = exports.VALID_TYPES = void 0;
 const core_1 = __nccwpck_require__(9093);
-const axios_1 = __importDefault(__nccwpck_require__(2940));
+const axios_1 = __importDefault(__nccwpck_require__(9218));
 const vercel_1 = __nccwpck_require__(6276);
 exports.VALID_TYPES = ["encrypted", "plain"];
 exports.VALID_TARGETS = [
@@ -30281,11 +30281,11 @@ module.exports = parseParams
 
 /***/ }),
 
-/***/ 2940:
+/***/ 9218:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
-// Axios v1.6.3 Copyright (c) 2023 Matt Zabriskie and contributors
+// Axios v1.6.4 Copyright (c) 2024 Matt Zabriskie and contributors
 
 
 const FormData$1 = __nccwpck_require__(6698);
@@ -31655,6 +31655,9 @@ function arrayToObject(arr) {
 function formDataToJSON(formData) {
   function buildPath(path, value, target, index) {
     let name = path[index++];
+
+    if (name === '__proto__') return true;
+
     const isNumericKey = Number.isFinite(+name);
     const isLast = index >= path.length;
     name = !name && utils$1.isArray(target) ? target.length : name;
@@ -32306,7 +32309,7 @@ function buildFullPath(baseURL, requestedURL) {
   return requestedURL;
 }
 
-const VERSION = "1.6.3";
+const VERSION = "1.6.4";
 
 function parseProtocol(url) {
   const match = /^([-+\w]{1,25})(:?\/\/|:)/.exec(url);

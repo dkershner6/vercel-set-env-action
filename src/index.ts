@@ -1,4 +1,5 @@
 import { getInput, setFailed, info } from "@actions/core";
+
 import VercelEnvVariabler from "./VercelEnvVariabler";
 
 async function run(): Promise<void> {

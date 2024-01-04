@@ -1,6 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { AxiosResponse } from "axios";
 import { mocked } from "jest-mock";
+
 import {
     ENV_2_VARIABLE_ID,
     ENV_3_VARIABLE_ID,
