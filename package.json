@@ -36,7 +36,7 @@
     "@vercel/ncc": "^0.38.1",
     "clone-deep": "^4.0.1",
     "constructs": "^10.0.0",
-    "dkershner6-projen-github-actions": "^0.0.11",
+    "dkershner6-projen-github-actions": "^0.0.24",
     "eslint": "^8",
     "eslint-config-prettier": "^9.1.0",
     "eslint-import-resolver-typescript": "^3.6.1",
@@ -48,9 +48,9 @@
     "jest-junit": "^15",
     "jest-mock": "^29.7.0",
     "prettier": "^3.1.1",
-    "projen": "^0.78.8",
+    "projen": "^0.78.11",
     "projen-github-action-typescript": "^0.0.395",
-    "projen-nvm": "^0.0.48",
+    "projen-nvm": "^0.0.62",
     "standard-version": "^9",
     "ts-jest": "^29.1.1",
     "ts-node": "^10.9.2",
@@ -60,7 +60,7 @@
   "dependencies": {
     "@actions/core": "^1.10.1",
     "@actions/github": "^6.0.0",
-    "axios": "^1.6.4"
+    "axios": "^1.6.5"
   },
   "pnpm": {},
   "engines": {
