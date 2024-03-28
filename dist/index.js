@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.VALID_TARGETS = exports.VALID_TYPES = void 0;
 const core_1 = __nccwpck_require__(9093);
-const axios_1 = __importDefault(__nccwpck_require__(2153));
+const axios_1 = __importDefault(__nccwpck_require__(314));
 const vercel_1 = __nccwpck_require__(6276);
 exports.VALID_TYPES = ["encrypted", "plain"];
 exports.VALID_TARGETS = [
@@ -216,7 +216,7 @@ var VercelEnvVariableTarget;
     VercelEnvVariableTarget["Development"] = "development";
 })(VercelEnvVariableTarget || (exports.VercelEnvVariableTarget = VercelEnvVariableTarget = {}));
 const listEnvVariables = async (vercelClient, projectName) => {
-    return vercelClient.get(`/projects/${projectName}/env`, {
+    return await vercelClient.get(`/projects/${projectName}/env`, {
         params: {
             decrypt: "true",
         },
@@ -224,14 +224,14 @@ const listEnvVariables = async (vercelClient, projectName) => {
 };
 exports.listEnvVariables = listEnvVariables;
 const postEnvVariable = async (vercelClient, projectName, envVariable) => {
-    return vercelClient.post(`/projects/${projectName}/env`, envVariable);
+    return await vercelClient.post(`/projects/${projectName}/env`, envVariable);
 };
 exports.postEnvVariable = postEnvVariable;
 const patchEnvVariable = async (vercelClient, projectName, envVariableId, envVariable) => {
-    return vercelClient.patch(`/projects/${projectName}/env/${envVariableId}`, envVariable);
+    return await vercelClient.patch(`/projects/${projectName}/env/${envVariableId}`, envVariable);
 };
 exports.patchEnvVariable = patchEnvVariable;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidmVyY2VsLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vc3JjL3ZlcmNlbC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7QUFJQSxxQ0FBcUM7QUFDckMsSUFBWSx1QkFJWDtBQUpELFdBQVksdUJBQXVCO0lBQy9CLG9EQUF5QixDQUFBO0lBQ3pCLDhDQUFtQixDQUFBO0lBQ25CLHNEQUEyQixDQUFBO0FBQy9CLENBQUMsRUFKVyx1QkFBdUIsdUNBQXZCLHVCQUF1QixRQUlsQztBQWdCTSxNQUFNLGdCQUFnQixHQUFHLEtBQUssRUFDakMsWUFBMkIsRUFDM0IsV0FBbUIsRUFLckIsRUFBRTtJQUNBLE9BQU8sWUFBWSxDQUFDLEdBQUcsQ0FFcEIsYUFBYSxXQUFXLE1BQU0sRUFBRTtRQUMvQixNQUFNLEVBQUU7WUFDSixPQUFPLEVBQUUsTUFBTTtTQUNsQjtLQUNKLENBQUMsQ0FBQztBQUNQLENBQUMsQ0FBQztBQWZXLFFBQUEsZ0JBQWdCLG9CQWUzQjtBQUVLLE1BQU0sZUFBZSxHQUFHLEtBQUssRUFDaEMsWUFBMkIsRUFDM0IsV0FBbUIsRUFDbkIsV0FBdUMsRUFDVyxFQUFFO0lBQ3BELE9BQU8sWUFBWSxDQUFDLElBQUksQ0FBQyxhQUFhLFdBQVcsTUFBTSxFQUFFLFdBQVcsQ0FBQyxDQUFDO0FBQzFFLENBQUMsQ0FBQztBQU5XLFFBQUEsZUFBZSxtQkFNMUI7QUFFSyxNQUFNLGdCQUFnQixHQUFHLEtBQUssRUFDakMsWUFBMkIsRUFDM0IsV0FBbUIsRUFDbkIsYUFBcUIsRUFDckIsV0FBdUMsRUFDVyxFQUFFO0lBQ3BELE9BQU8sWUFBWSxDQUFDLEtBQUssQ0FDckIsYUFBYSxXQUFXLFFBQVEsYUFBYSxFQUFFLEVBQy9DLFdBQVcsQ0FDZCxDQUFDO0FBQ04sQ0FBQyxDQUFDO0FBVlcsUUFBQSxnQkFBZ0Isb0JBVTNCIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgQXhpb3NJbnN0YW5jZSwgQXhpb3NSZXNwb25zZSB9IGZyb20gXCJheGlvc1wiO1xuXG5leHBvcnQgdHlwZSBWZXJjZWxFbnZWYXJpYWJsZVR5cGUgPSBcImVuY3J5cHRlZFwiIHwgXCJwbGFpblwiO1xuXG4vLyBlc2xpbnQtZGlzYWJsZS1uZXh0LWxpbmUgbm8tc2hhZG93XG5leHBvcnQgZW51bSBWZXJjZWxFbnZWYXJpYWJsZVRhcmdldCB7XG4gICAgUHJvZHVjdGlvbiA9IFwicHJvZHVjdGlvblwiLFxuICAgIFByZXZpZXcgPSBcInByZXZpZXdcIixcbiAgICBEZXZlbG9wbWVudCA9IFwiZGV2ZWxvcG1lbnRcIixcbn1cblxuZXhwb3J0IGludGVyZmFjZSBWZXJjZWxFbnZWYXJpYWJsZSB7XG4gICAgdHlwZTogVmVyY2VsRW52VmFyaWFibGVUeXBlO1xuICAgIHZhbHVlOiBzdHJpbmc7XG4gICAgdGFyZ2V0OiBWZXJjZWxFbnZWYXJpYWJsZVRhcmdldFtdO1xuICAgIGNvbmZpZ3VyYXRpb25JZD86IHN0cmluZztcbiAgICBnaXRCcmFuY2g/OiBzdHJpbmc7XG4gICAgaWQ6IHN0cmluZztcbiAgICBrZXk6IHN0cmluZztcbiAgICBjcmVhdGVkQXQ6IG51bWJlcjtcbiAgICB1cGRhdGVkQXQ6IG51bWJlcjtcbiAgICBjcmVhdGVkQnk6IHN0cmluZztcbiAgICB1cGRhdGVkQnk6IHN0cmluZztcbn1cblxuZXhwb3J0IGNvbnN0IGxpc3RFbnZWYXJpYWJsZXMgPSBhc3luYyAoXG4gICAgdmVyY2VsQ2xpZW50OiBBeGlvc0luc3RhbmNlLFxuICAgIHByb2plY3ROYW1lOiBzdHJpbmcsXG4pOiBQcm9taXNlPFxuICAgIEF4aW9zUmVzcG9uc2U8e1xuICAgICAgICBlbnZzOiBWZXJjZWxFbnZWYXJpYWJsZVtdO1xuICAgIH0+XG4+ID0+IHtcbiAgICByZXR1cm4gdmVyY2VsQ2xpZW50LmdldDx7XG4gICAgICAgIGVudnM6IFZlcmNlbEVudlZhcmlhYmxlW107XG4gICAgfT4oYC9wcm9qZWN0cy8ke3Byb2plY3ROYW1lfS9lbnZgLCB7XG4gICAgICAgIHBhcmFtczoge1xuICAgICAgICAgICAgZGVjcnlwdDogXCJ0cnVlXCIsXG4gICAgICAgIH0sXG4gICAgfSk7XG59O1xuXG5leHBvcnQgY29uc3QgcG9zdEVudlZhcmlhYmxlID0gYXN5bmMgKFxuICAgIHZlcmNlbENsaWVudDogQXhpb3NJbnN0YW5jZSxcbiAgICBwcm9qZWN0TmFtZTogc3RyaW5nLFxuICAgIGVudlZhcmlhYmxlOiBQYXJ0aWFsPFZlcmNlbEVudlZhcmlhYmxlPixcbik6IFByb21pc2U8QXhpb3NSZXNwb25zZTx7IGVudjogVmVyY2VsRW52VmFyaWFibGUgfT4+ID0+IHtcbiAgICByZXR1cm4gdmVyY2VsQ2xpZW50LnBvc3QoYC9wcm9qZWN0cy8ke3Byb2plY3ROYW1lfS9lbnZgLCBlbnZWYXJpYWJsZSk7XG59O1xuXG5leHBvcnQgY29uc3QgcGF0Y2hFbnZWYXJpYWJsZSA9IGFzeW5jIChcbiAgICB2ZXJjZWxDbGllbnQ6IEF4aW9zSW5zdGFuY2UsXG4gICAgcHJvamVjdE5hbWU6IHN0cmluZyxcbiAgICBlbnZWYXJpYWJsZUlkOiBzdHJpbmcsXG4gICAgZW52VmFyaWFibGU6IFBhcnRpYWw8VmVyY2VsRW52VmFyaWFibGU+LFxuKTogUHJvbWlzZTxBeGlvc1Jlc3BvbnNlPHsgZW52OiBWZXJjZWxFbnZWYXJpYWJsZSB9Pj4gPT4ge1xuICAgIHJldHVybiB2ZXJjZWxDbGllbnQucGF0Y2goXG4gICAgICAgIGAvcHJvamVjdHMvJHtwcm9qZWN0TmFtZX0vZW52LyR7ZW52VmFyaWFibGVJZH1gLFxuICAgICAgICBlbnZWYXJpYWJsZSxcbiAgICApO1xufTtcbiJdfQ==
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidmVyY2VsLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vc3JjL3ZlcmNlbC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7QUFJQSxxQ0FBcUM7QUFDckMsSUFBWSx1QkFJWDtBQUpELFdBQVksdUJBQXVCO0lBQy9CLG9EQUF5QixDQUFBO0lBQ3pCLDhDQUFtQixDQUFBO0lBQ25CLHNEQUEyQixDQUFBO0FBQy9CLENBQUMsRUFKVyx1QkFBdUIsdUNBQXZCLHVCQUF1QixRQUlsQztBQWdCTSxNQUFNLGdCQUFnQixHQUFHLEtBQUssRUFDakMsWUFBMkIsRUFDM0IsV0FBbUIsRUFLckIsRUFBRTtJQUNBLE9BQU8sTUFBTSxZQUFZLENBQUMsR0FBRyxDQUUxQixhQUFhLFdBQVcsTUFBTSxFQUFFO1FBQy9CLE1BQU0sRUFBRTtZQUNKLE9BQU8sRUFBRSxNQUFNO1NBQ2xCO0tBQ0osQ0FBQyxDQUFDO0FBQ1AsQ0FBQyxDQUFDO0FBZlcsUUFBQSxnQkFBZ0Isb0JBZTNCO0FBRUssTUFBTSxlQUFlLEdBQUcsS0FBSyxFQUNoQyxZQUEyQixFQUMzQixXQUFtQixFQUNuQixXQUF1QyxFQUNXLEVBQUU7SUFDcEQsT0FBTyxNQUFNLFlBQVksQ0FBQyxJQUFJLENBQUMsYUFBYSxXQUFXLE1BQU0sRUFBRSxXQUFXLENBQUMsQ0FBQztBQUNoRixDQUFDLENBQUM7QUFOVyxRQUFBLGVBQWUsbUJBTTFCO0FBRUssTUFBTSxnQkFBZ0IsR0FBRyxLQUFLLEVBQ2pDLFlBQTJCLEVBQzNCLFdBQW1CLEVBQ25CLGFBQXFCLEVBQ3JCLFdBQXVDLEVBQ1csRUFBRTtJQUNwRCxPQUFPLE1BQU0sWUFBWSxDQUFDLEtBQUssQ0FDM0IsYUFBYSxXQUFXLFFBQVEsYUFBYSxFQUFFLEVBQy9DLFdBQVcsQ0FDZCxDQUFDO0FBQ04sQ0FBQyxDQUFDO0FBVlcsUUFBQSxnQkFBZ0Isb0JBVTNCIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgQXhpb3NJbnN0YW5jZSwgQXhpb3NSZXNwb25zZSB9IGZyb20gXCJheGlvc1wiO1xuXG5leHBvcnQgdHlwZSBWZXJjZWxFbnZWYXJpYWJsZVR5cGUgPSBcImVuY3J5cHRlZFwiIHwgXCJwbGFpblwiO1xuXG4vLyBlc2xpbnQtZGlzYWJsZS1uZXh0LWxpbmUgbm8tc2hhZG93XG5leHBvcnQgZW51bSBWZXJjZWxFbnZWYXJpYWJsZVRhcmdldCB7XG4gICAgUHJvZHVjdGlvbiA9IFwicHJvZHVjdGlvblwiLFxuICAgIFByZXZpZXcgPSBcInByZXZpZXdcIixcbiAgICBEZXZlbG9wbWVudCA9IFwiZGV2ZWxvcG1lbnRcIixcbn1cblxuZXhwb3J0IGludGVyZmFjZSBWZXJjZWxFbnZWYXJpYWJsZSB7XG4gICAgdHlwZTogVmVyY2VsRW52VmFyaWFibGVUeXBlO1xuICAgIHZhbHVlOiBzdHJpbmc7XG4gICAgdGFyZ2V0OiBWZXJjZWxFbnZWYXJpYWJsZVRhcmdldFtdO1xuICAgIGNvbmZpZ3VyYXRpb25JZD86IHN0cmluZztcbiAgICBnaXRCcmFuY2g/OiBzdHJpbmc7XG4gICAgaWQ6IHN0cmluZztcbiAgICBrZXk6IHN0cmluZztcbiAgICBjcmVhdGVkQXQ6IG51bWJlcjtcbiAgICB1cGRhdGVkQXQ6IG51bWJlcjtcbiAgICBjcmVhdGVkQnk6IHN0cmluZztcbiAgICB1cGRhdGVkQnk6IHN0cmluZztcbn1cblxuZXhwb3J0IGNvbnN0IGxpc3RFbnZWYXJpYWJsZXMgPSBhc3luYyAoXG4gICAgdmVyY2VsQ2xpZW50OiBBeGlvc0luc3RhbmNlLFxuICAgIHByb2plY3ROYW1lOiBzdHJpbmcsXG4pOiBQcm9taXNlPFxuICAgIEF4aW9zUmVzcG9uc2U8e1xuICAgICAgICBlbnZzOiBWZXJjZWxFbnZWYXJpYWJsZVtdO1xuICAgIH0+XG4+ID0+IHtcbiAgICByZXR1cm4gYXdhaXQgdmVyY2VsQ2xpZW50LmdldDx7XG4gICAgICAgIGVudnM6IFZlcmNlbEVudlZhcmlhYmxlW107XG4gICAgfT4oYC9wcm9qZWN0cy8ke3Byb2plY3ROYW1lfS9lbnZgLCB7XG4gICAgICAgIHBhcmFtczoge1xuICAgICAgICAgICAgZGVjcnlwdDogXCJ0cnVlXCIsXG4gICAgICAgIH0sXG4gICAgfSk7XG59O1xuXG5leHBvcnQgY29uc3QgcG9zdEVudlZhcmlhYmxlID0gYXN5bmMgKFxuICAgIHZlcmNlbENsaWVudDogQXhpb3NJbnN0YW5jZSxcbiAgICBwcm9qZWN0TmFtZTogc3RyaW5nLFxuICAgIGVudlZhcmlhYmxlOiBQYXJ0aWFsPFZlcmNlbEVudlZhcmlhYmxlPixcbik6IFByb21pc2U8QXhpb3NSZXNwb25zZTx7IGVudjogVmVyY2VsRW52VmFyaWFibGUgfT4+ID0+IHtcbiAgICByZXR1cm4gYXdhaXQgdmVyY2VsQ2xpZW50LnBvc3QoYC9wcm9qZWN0cy8ke3Byb2plY3ROYW1lfS9lbnZgLCBlbnZWYXJpYWJsZSk7XG59O1xuXG5leHBvcnQgY29uc3QgcGF0Y2hFbnZWYXJpYWJsZSA9IGFzeW5jIChcbiAgICB2ZXJjZWxDbGllbnQ6IEF4aW9zSW5zdGFuY2UsXG4gICAgcHJvamVjdE5hbWU6IHN0cmluZyxcbiAgICBlbnZWYXJpYWJsZUlkOiBzdHJpbmcsXG4gICAgZW52VmFyaWFibGU6IFBhcnRpYWw8VmVyY2VsRW52VmFyaWFibGU+LFxuKTogUHJvbWlzZTxBeGlvc1Jlc3BvbnNlPHsgZW52OiBWZXJjZWxFbnZWYXJpYWJsZSB9Pj4gPT4ge1xuICAgIHJldHVybiBhd2FpdCB2ZXJjZWxDbGllbnQucGF0Y2goXG4gICAgICAgIGAvcHJvamVjdHMvJHtwcm9qZWN0TmFtZX0vZW52LyR7ZW52VmFyaWFibGVJZH1gLFxuICAgICAgICBlbnZWYXJpYWJsZSxcbiAgICApO1xufTtcbiJdfQ==
 
 /***/ }),
 
@@ -3682,7 +3682,7 @@ DelayedStream.prototype._checkIfMaxDataSizeExceeded = function() {
 
 /***/ }),
 
-/***/ 6454:
+/***/ 1753:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 var debug;
@@ -3704,7 +3704,7 @@ module.exports = function () {
 
 /***/ }),
 
-/***/ 6914:
+/***/ 444:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 var url = __nccwpck_require__(7310);
@@ -3713,7 +3713,7 @@ var http = __nccwpck_require__(3685);
 var https = __nccwpck_require__(5687);
 var Writable = (__nccwpck_require__(2781).Writable);
 var assert = __nccwpck_require__(9491);
-var debug = __nccwpck_require__(6454);
+var debug = __nccwpck_require__(1753);
 
 // Whether to use the native URL object or the legacy url module
 var useNativeURL = false;
@@ -3736,6 +3736,7 @@ var preservedUrlFields = [
   "protocol",
   "query",
   "search",
+  "hash",
 ];
 
 // Create handlers that pass events from native requests
@@ -4169,7 +4170,7 @@ RedirectableRequest.prototype._processResponse = function (response) {
      redirectUrl.protocol !== "https:" ||
      redirectUrl.host !== currentHost &&
      !isSubdomain(redirectUrl.host, currentHost)) {
-    removeMatchingHeaders(/^(?:authorization|cookie)$/i, this._options.headers);
+    removeMatchingHeaders(/^(?:(?:proxy-)?authorization|cookie)$/i, this._options.headers);
   }
 
   // Evaluate the beforeRedirect callback
@@ -30281,11 +30282,11 @@ module.exports = parseParams
 
 /***/ }),
 
-/***/ 2153:
+/***/ 314:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
-// Axios v1.6.5 Copyright (c) 2024 Matt Zabriskie and contributors
+// Axios v1.6.8 Copyright (c) 2024 Matt Zabriskie and contributors
 
 
 const FormData$1 = __nccwpck_require__(6698);
@@ -30294,10 +30295,10 @@ const proxyFromEnv = __nccwpck_require__(2324);
 const http = __nccwpck_require__(3685);
 const https = __nccwpck_require__(5687);
 const util = __nccwpck_require__(3837);
-const followRedirects = __nccwpck_require__(6914);
+const followRedirects = __nccwpck_require__(444);
 const zlib = __nccwpck_require__(9796);
 const stream = __nccwpck_require__(2781);
-const EventEmitter = __nccwpck_require__(2361);
+const events = __nccwpck_require__(2361);
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -30309,7 +30310,6 @@ const util__default = /*#__PURE__*/_interopDefaultLegacy(util);
 const followRedirects__default = /*#__PURE__*/_interopDefaultLegacy(followRedirects);
 const zlib__default = /*#__PURE__*/_interopDefaultLegacy(zlib);
 const stream__default = /*#__PURE__*/_interopDefaultLegacy(stream);
-const EventEmitter__default = /*#__PURE__*/_interopDefaultLegacy(EventEmitter);
 
 function bind(fn, thisArg) {
   return function wrap() {
@@ -31741,9 +31741,6 @@ const defaults = {
     const isFormData = utils$1.isFormData(data);
 
     if (isFormData) {
-      if (!hasJSONContentType) {
-        return data;
-      }
       return hasJSONContentType ? JSON.stringify(formDataToJSON(data)) : data;
     }
 
@@ -32309,7 +32306,7 @@ function buildFullPath(baseURL, requestedURL) {
   return requestedURL;
 }
 
-const VERSION = "1.6.5";
+const VERSION = "1.6.8";
 
 function parseProtocol(url) {
   const match = /^([-+\w]{1,25})(:?\/\/|:)/.exec(url);
@@ -32822,12 +32819,12 @@ const supportedProtocols = platform.protocols.map(protocol => {
  *
  * @returns {Object<string, any>}
  */
-function dispatchBeforeRedirect(options) {
+function dispatchBeforeRedirect(options, responseDetails) {
   if (options.beforeRedirects.proxy) {
     options.beforeRedirects.proxy(options);
   }
   if (options.beforeRedirects.config) {
-    options.beforeRedirects.config(options);
+    options.beforeRedirects.config(options, responseDetails);
   }
 }
 
@@ -32952,7 +32949,7 @@ const httpAdapter = isHttpAdapterSupported && function httpAdapter(config) {
     }
 
     // temporary internal emitter until the AxiosRequest class will be implemented
-    const emitter = new EventEmitter__default["default"]();
+    const emitter = new events.EventEmitter();
 
     const onFinished = () => {
       if (config.cancelToken) {
@@ -33942,7 +33939,7 @@ function dispatchRequest(config) {
   });
 }
 
-const headersToObject = (thing) => thing instanceof AxiosHeaders$1 ? thing.toJSON() : thing;
+const headersToObject = (thing) => thing instanceof AxiosHeaders$1 ? { ...thing } : thing;
 
 /**
  * Config-specific merge-function which creates a new config-object
@@ -34157,7 +34154,31 @@ class Axios {
    *
    * @returns {Promise} The Promise to be fulfilled
    */
-  request(configOrUrl, config) {
+  async request(configOrUrl, config) {
+    try {
+      return await this._request(configOrUrl, config);
+    } catch (err) {
+      if (err instanceof Error) {
+        let dummy;
+
+        Error.captureStackTrace ? Error.captureStackTrace(dummy = {}) : (dummy = new Error());
+
+        // slice off the Error: ... line
+        const stack = dummy.stack ? dummy.stack.replace(/^.+\n/, '') : '';
+
+        if (!err.stack) {
+          err.stack = stack;
+          // match without the 2 top stack lines
+        } else if (stack && !String(err.stack).endsWith(stack.replace(/^.+\n.+\n/, ''))) {
+          err.stack += '\n' + stack;
+        }
+      }
+
+      throw err;
+    }
+  }
+
+  _request(configOrUrl, config) {
     /*eslint no-param-reassign:0*/
     // Allow for axios('example/url'[, config]) a la fetch API
     if (typeof configOrUrl === 'string') {
